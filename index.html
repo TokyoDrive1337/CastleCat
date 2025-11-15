@@ -30,22 +30,22 @@
             <img src="Images/flag_ua.png" alt="UA" onclick="changeLanguage('ua')">
         </div>
 
-        <div id="main-menu">
+        <div id="main-menu" class="hidden">
             <h2 data-lang="select_class">Select Your Class</h2>
             <div class="class-selection">
-                <button class="class-btn" onclick="selectClass('krest')">
+                <button class="class-btn" data-class="krest" onclick="selectClass('krest')">
                     <img src="Images/krest1.png" alt="Peasant">
                     <span data-lang="class_peasant">Peasant</span>
                 </button>
-                <button class="class-btn" onclick="selectClass('BOW')">
+                <button class="class-btn" data-class="BOW" onclick="selectClass('BOW')">
                     <img src="Images/BOW1.png" alt="Archer">
                     <span data-lang="class_archer">Archer</span>
                 </button>
-                <button class="class-btn" onclick="selectClass('MAG')">
+                <button class="class-btn" data-class="MAG" onclick="selectClass('MAG')">
                     <img src="Images/MAG1.png" alt="Mage">
                     <span data-lang="class_mage">Mage</span>
                 </button>
-                <button class="class-btn" onclick="selectClass('krestos')">
+                <button class="class-btn" data-class="krestos" onclick="selectClass('krestos')">
                     <img src="Images/krestos1.png" alt="Crusader">
                     <span data-lang="class_crusader">Crusader</span>
                 </button>
@@ -54,9 +54,6 @@
 
         <div id="game-screen" class="hidden">
             
-            <div id="stats-bar">
-                </div>
-
             <div id="xp-bar-container">
                 <div id="xp-bar-fill"></div>
                 <div id="xp-bar-sparkles"></div> 
@@ -94,7 +91,7 @@
         </div>
 
         <div id="floating-text-container"></div>
-        <div id="save-indicator" class="hidden">Game Saved</div> </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
