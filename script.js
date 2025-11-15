@@ -21,14 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const dom = {
         startOverlay: document.getElementById('start-overlay'), 
         music: document.getElementById('bg-music'),
-        
-        musicControls: document.getElementById('music-controls'),
         volumeSlider: document.getElementById('volume-slider'),
-        
-        langSwitcher: document.getElementById('lang-switcher'), // Контейнер флагов
-        langMenuContainer: document.getElementById('lang-menu-container'),
+        langSwitcher: document.getElementById('lang-switcher'), 
         currentFlagIcon: document.getElementById('current-flag'),
-        
         mainMenu: document.getElementById('main-menu'),
         gameScreen: document.getElementById('game-screen'),
         moneyCount: document.getElementById('money-count'), 
@@ -40,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         textElements: document.querySelectorAll('[data-lang]')
     };
 
-    // --- 3. База данных переводов ---
+    // --- 3. База данных переводов (без изменений) ---
     const translations = {
         'en': {
             'click_to_start': 'Click to Start', 'select_class': 'Select Your Class',
@@ -77,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-    // --- 4. Функции Сохранения/Загрузки ---
+    // --- 4. Функции Сохранения/Загрузки (без изменений) ---
 
     function saveGame() {
         localStorage.setItem('gameState', JSON.stringify(gameState));
@@ -129,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.langSwitcher.classList.remove('visible');
     };
     
-    // Новая (или исправленная) функция для проигрывания музыки
+    // Музыка
     window.playMusic = () => {
         if (!isMusicPlaying) {
             dom.music.volume = dom.volumeSlider.value / 100;
@@ -146,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('speaker-icon').src = 'Images/icon_speaker_on.png';
             dom.volumeSlider.value = lastVolume;
             dom.music.volume = lastVolume / 100;
-            // Попытка запустить музыку при включении звука, если она еще не играет
             playMusic();
         } else {
             lastVolume = dom.volumeSlider.value;
@@ -166,14 +160,14 @@ document.addEventListener('DOMContentLoaded', () => {
             dom.music.muted = false;
             document.getElementById('speaker-icon').src = 'Images/icon_speaker_on.png';
             lastVolume = volumeValue;
-            playMusic(); // Попытка запустить музыку при регулировке громкости
+            playMusic();
         } else {
             dom.music.muted = true;
             document.getElementById('speaker-icon').src = 'Images/icon_speaker_off.png';
         }
     });
 
-
+    // Функция выбора класса (запускает музыку)
     window.selectClass = (className) => {
         if (gameState.selectedClass && gameState.selectedClass !== className) {
             saveGame();
@@ -187,9 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         updateUI();
         saveGame();
-        playMusic(); // Запуск музыки при выборе персонажа (первый клик)
+        playMusic(); // Музыка запускается здесь, после первого взаимодействия
     };
 
+    // ... (handleClick, buyItem, checkLevelUp, updateUI - без изменений) ...
     window.handleClick = () => {
         const currentProgress = getCurrentProgress();
         const reward = getCoinReward();
@@ -266,50 +261,22 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.xpBarFill.style.width = `${xpPercent}%`;
     }
     
-    // --- 6. Вспомогательные и Инициализация ---
+    // ... (Вспомогательные функции - без изменений) ...
 
-    function getCoinReward() { /* ... */
-        const rand = Math.random() * 100; 
-        if (rand < 4) { return 0.2; }
-        else if (rand < 9) { return 20.0; }
-        else { return getRandomInt(5, 16) + Math.random(); }
-    }
-    
-    function showFloatingText(text, type) { 
-        const el = document.createElement('div');
-        el.className = `floating-text ${type}`;
-        el.textContent = text;
-        el.style.left = `${getRandomInt(-30, 30)}px`;
-        dom.floatingTextContainer.appendChild(el);
-        
-        setTimeout(() => {
-            el.remove();
-        }, 1000); 
-    }
-
-    function getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
 
     // Инициализация
     loadGame(); 
     
-    // Установка языка по умолчанию (или загруженного) при старте
     const defaultFlagSrc = document.querySelector(`#lang-switcher img[alt="${currentLang.toUpperCase()}"]`)?.src || 'Images/flag_en.png';
     window.changeLanguage(currentLang, defaultFlagSrc);
 
-    // КРИТИЧЕСКИЙ ФИКС: Убираем из этого блока все, кроме скрытия оверлея
+    // ФИКС БЛОКИРОВКИ: Просто скрываем оверлей при клике
     document.getElementById('start-overlay').addEventListener('click', () => {
-        // Проверяем, был ли выбран персонаж в прошлой сессии
         if (!gameState.selectedClass) {
-            // Если не был, устанавливаем 'krest' по умолчанию
             gameState.selectedClass = 'krest';
             saveGame();
         }
         
-        // Главное: оверлей должен исчезнуть
         document.getElementById('start-overlay').style.display = 'none'; 
     }, { once: true }); 
 
