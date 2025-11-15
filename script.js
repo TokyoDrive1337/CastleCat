@@ -111,7 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 5. Основные Функции Игры ---
     
-    // НОВАЯ ФУНКЦИЯ: Показать/скрыть меню языка
     window.toggleLanguageMenu = () => {
         dom.langSwitcher.classList.toggle('visible');
     };
@@ -126,11 +125,54 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // Обновляем иконку на кнопке переключения
         dom.currentFlagIcon.src = flagSrc;
-        // Скрываем меню после выбора
         dom.langSwitcher.classList.remove('visible');
     };
+    
+    // Новая (или исправленная) функция для проигрывания музыки
+    window.playMusic = () => {
+        if (!isMusicPlaying) {
+            dom.music.volume = dom.volumeSlider.value / 100;
+            // Убрал .then().catch(), чтобы не блокировать выполнение
+            dom.music.play();
+            isMusicPlaying = true;
+        }
+    };
+    
+    window.toggleMute = () => {
+        // Логика mute/unmute
+        if (dom.music.muted) {
+            dom.music.muted = false;
+            document.getElementById('speaker-icon').src = 'Images/icon_speaker_on.png';
+            dom.volumeSlider.value = lastVolume;
+            dom.music.volume = lastVolume / 100;
+            // Попытка запустить музыку при включении звука, если она еще не играет
+            playMusic();
+        } else {
+            lastVolume = dom.volumeSlider.value;
+            dom.music.muted = true;
+            document.getElementById('speaker-icon').src = 'Images/icon_speaker_off.png';
+            dom.volumeSlider.value = 0; 
+        }
+    };
+    
+    dom.volumeSlider.addEventListener('input', (e) => {
+        const volumeValue = e.target.value;
+        const musicVolume = volumeValue / 100;
+
+        dom.music.volume = musicVolume;
+        
+        if (volumeValue > 0) {
+            dom.music.muted = false;
+            document.getElementById('speaker-icon').src = 'Images/icon_speaker_on.png';
+            lastVolume = volumeValue;
+            playMusic(); // Попытка запустить музыку при регулировке громкости
+        } else {
+            dom.music.muted = true;
+            document.getElementById('speaker-icon').src = 'Images/icon_speaker_off.png';
+        }
+    });
+
 
     window.selectClass = (className) => {
         if (gameState.selectedClass && gameState.selectedClass !== className) {
@@ -145,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         updateUI();
         saveGame();
+        playMusic(); // Запуск музыки при выборе персонажа (первый клик)
     };
 
     window.handleClick = () => {
@@ -231,22 +274,42 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (rand < 9) { return 20.0; }
         else { return getRandomInt(5, 16) + Math.random(); }
     }
-
-    // ... (playMusic, showFloatingText, getRandomInt - без изменений)
     
+    function showFloatingText(text, type) { 
+        const el = document.createElement('div');
+        el.className = `floating-text ${type}`;
+        el.textContent = text;
+        el.style.left = `${getRandomInt(-30, 30)}px`;
+        dom.floatingTextContainer.appendChild(el);
+        
+        setTimeout(() => {
+            el.remove();
+        }, 1000); 
+    }
+
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     // Инициализация
     loadGame(); 
+    
     // Установка языка по умолчанию (или загруженного) при старте
     const defaultFlagSrc = document.querySelector(`#lang-switcher img[alt="${currentLang.toUpperCase()}"]`)?.src || 'Images/flag_en.png';
     window.changeLanguage(currentLang, defaultFlagSrc);
 
+    // КРИТИЧЕСКИЙ ФИКС: Убираем из этого блока все, кроме скрытия оверлея
     document.getElementById('start-overlay').addEventListener('click', () => {
+        // Проверяем, был ли выбран персонаж в прошлой сессии
         if (!gameState.selectedClass) {
+            // Если не был, устанавливаем 'krest' по умолчанию
             gameState.selectedClass = 'krest';
             saveGame();
         }
         
-        // playMusic(); // Раскомментируйте, если хотите, чтобы музыка включалась сразу
+        // Главное: оверлей должен исчезнуть
         document.getElementById('start-overlay').style.display = 'none'; 
     }, { once: true }); 
 
