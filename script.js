@@ -6,7 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let level = 1;
     let selectedClass = '';
     let currentLang = 'en'; 
-    const xpToNextLevel = 1613;
+    // ИЗМЕНЕНИЕ 3: Более реалистичная прогрессия XP (для примера)
+    // Функция для расчета XP: 1000 + (level * 100) + Math.pow(level, 2) * 50;
+    const getXpToNextLevel = (lvl) => 1000 + (lvl * 100) + Math.pow(lvl, 2) * 50; 
+    let xpNeededForCurrentLevel = getXpToNextLevel(1); 
     let isMusicPlaying = false;
     let lastVolume = 30; 
 
@@ -25,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         moneyContainerBottom: document.getElementById('money-container-bottom'), 
         moneyCount: document.getElementById('money-count'), 
         levelDisplay: document.getElementById('current-level'),
+        xpBarContainer: document.getElementById('xp-bar-container'), // Добавлено
         xpBarFill: document.getElementById('xp-bar-fill'),
         xpText: document.getElementById('xp-text'),
         characterImage: document.getElementById('character-image'),
@@ -32,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         textElements: document.querySelectorAll('[data-lang]')
     };
 
-    // --- 3. База данных переводов (Ключи соответствуют исправленному HTML) ---
+    // --- 3. База данных переводов ---
     const translations = {
         'en': {
             'click_to_start': 'Click to Start',
@@ -121,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ИЗМЕНЕНИЕ 4: Функция переключения языка
     window.changeLanguage = (lang) => {
         currentLang = lang;
         const langData = translations[lang];
@@ -130,12 +135,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.textContent = langData[key];
             }
         });
+        // Дополнительно обновляем XP-текст при смене языка
+        updateXPDisplay(true); 
     };
 
     window.selectClass = (className) => {
         selectedClass = className;
         level = 1;
         xp = 0;
+        xpNeededForCurrentLevel = getXpToNextLevel(1); // Инициализация XP для 1 уровня
         
         dom.mainMenu.classList.add('hidden');
         dom.gameScreen.classList.remove('hidden');
@@ -184,20 +192,54 @@ document.addEventListener('DOMContentLoaded', () => {
             checkLevelUp();
             updateUI();
         } else if (cost > 0 && money < cost) {
-            console.log("Not enough money");
+            // Можно добавить сообщение о недостатке денег
+            showFloatingText(translations[currentLang]['cost'] + ' x', 'coin');
         }
     };
 
+    // ИЗМЕНЕНИЕ 3: Обновленная логика повышения уровня
     function checkLevelUp() {
-        while (xp >= xpToNextLevel) { 
-            if (level < 5) {
-                level++;
-                xp -= xpToNextLevel; 
-            } else {
-                xp = xpToNextLevel; 
-                break; 
-            }
+        // Уровень MAX_LEVEL (например, 5)
+        const MAX_LEVEL = 5; 
+        let leveledUp = false;
+
+        while (xp >= xpNeededForCurrentLevel && level < MAX_LEVEL) { 
+            level++;
+            // Вычитаем только то XP, что нужно было для прошлого уровня
+            xp -= xpNeededForCurrentLevel; 
+            xpNeededForCurrentLevel = getXpToNextLevel(level); // Расчет XP для следующего уровня
+            leveledUp = true;
         }
+        
+        // Если достигнут MAX_LEVEL
+        if (level === MAX_LEVEL && xp > xpNeededForCurrentLevel) {
+             xp = xpNeededForCurrentLevel;
+        }
+
+        if (leveledUp) {
+            // Добавляем эффект повышения уровня (можно создать отдельную анимацию)
+            console.log(`Leveled Up! New Level: ${level}`);
+            showFloatingText(`LEVEL UP! ${level}`, 'xp');
+        }
+    }
+
+    // ИЗМЕНЕНИЕ 3: Функция обновления интерфейса XP
+    function updateXPDisplay(forceUpdate = false) {
+        const MAX_LEVEL = 5;
+        let xpPercent;
+        
+        if (level >= MAX_LEVEL) {
+            xpPercent = 100;
+            // Получаем перевод для "MAX LEVEL"
+            const maxLevelText = translations[currentLang]['level'] ? translations[currentLang]['level'] + ' MAX' : "MAX LEVEL";
+            dom.xpText.textContent = maxLevelText;
+        } else {
+            xpPercent = (xp / xpNeededForCurrentLevel) * 100;
+            dom.xpText.textContent = `${Math.floor(xp)} / ${xpNeededForCurrentLevel} (${xpPercent.toFixed(0)}%)`;
+        }
+
+        // Плавное заполнение шкалы
+        dom.xpBarFill.style.width = `${xpPercent}%`;
     }
 
     function updateUI() {
@@ -207,23 +249,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Эта строка отвечает за отображение картинки персонажа
         dom.characterImage.src = `Images/${selectedClass}${level}.png`;
         
-        let xpPercent = (xp / xpToNextLevel) * 100;
-        
-        if (level === 5) {
-            xpPercent = 100;
-            dom.xpText.textContent = "MAX LEVEL";
-        } else {
-            dom.xpText.textContent = `${Math.floor(xp)} / ${xpToNextLevel} (${xpPercent.toFixed(0)}%)`;
-        }
-        
-        dom.xpBarFill.style.width = `${xpPercent}%`;
+        updateXPDisplay(); // Обновление шкалы XP
     }
 
     function showFloatingText(text, type) {
         const el = document.createElement('div');
         el.className = `floating-text ${type}`;
         el.textContent = text;
-        el.style.left = `${getRandomInt(-30, 30)}px`;
+        
+        // Рандомное позиционирование вокруг центра
+        const randomX = getRandomInt(-50, 50); 
+        const randomY = getRandomInt(-50, 50);
+        
+        el.style.left = `calc(50% + ${randomX}px)`;
+        el.style.top = `calc(50% + ${randomY}px)`;
+        
         dom.floatingTextContainer.appendChild(el);
         
         setTimeout(() => {
