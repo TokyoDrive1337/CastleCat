@@ -16,7 +16,7 @@
 }
 
 #start-overlay h1 {
-    font-size: 8vw; /* Адаптивный размер шрифта */
+    font-size: 8vw;
     color: white;
     text-shadow: 0 0 15px white, 0 0 25px white;
     animation: pulse 2s infinite;
@@ -55,13 +55,12 @@ body, html {
 
 /* ==========================================
   АДАПТИВНОЕ ПОЗИЦИОНИРОВАНИЕ
-  Используем vh/vw для отступов
   ==========================================
 */
 #music-controls {
     position: absolute;
-    bottom: 3vh; /* Адаптивный отступ снизу */
-    left: 3vw;   /* Адаптивный отступ слева */
+    bottom: 3vh; 
+    left: 3vw;   
     z-index: 100;
     background: rgba(0, 0, 0, 0.3);
     padding: 1vh 2vw; 
@@ -81,14 +80,14 @@ body, html {
 
 #volume-slider {
     width: 12vw;
-    max-width: 100px; /* Ограничение для ПК */
+    max-width: 100px; 
     cursor: pointer;
 }
 
 #lang-switcher {
     position: absolute;
-    top: 3vh;   /* Адаптивный отступ сверху */
-    right: 3vw; /* Адаптивный отступ справа */
+    top: 3vh;   
+    right: 3vw; 
     z-index: 100;
     background: rgba(0, 0, 0, 0.3);
     padding: 0.5vh 0.8vw;
@@ -96,7 +95,7 @@ body, html {
 }
 
 #lang-switcher img {
-    width: 4.5vh; /* Размер флагов масштабируется относительно высоты */
+    width: 4.5vh; 
     height: 3.5vh;
     cursor: pointer;
     margin-left: 8px;
@@ -110,7 +109,7 @@ body, html {
 /* Главное меню */
 #main-menu {
     width: 90%;
-    max-width: 1000px; /* Ограничение ширины для ПК */
+    max-width: 1000px; 
     padding: 4vh;
     text-align: center;
     background: rgba(0, 0, 0, 0.2);
@@ -128,7 +127,7 @@ body, html {
 
 .class-btn {
     width: 20vw;
-    max-width: 200px; /* Ограничение для ПК */
+    max-width: 200px; 
     padding: 2vh;
 }
 
@@ -137,6 +136,8 @@ body, html {
     height: 15vw;
     max-width: 150px;
     max-height: 150px;
+    /* ФИКС: Добавляем фильтр, чтобы скрыть "белый фон" и выделить изображение */
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
 }
 
 .class-btn span {
@@ -149,11 +150,11 @@ body, html {
 #game-screen {
     width: 100%;
     height: 100%;
-    max-width: 1000px; /* Ограничиваем ширину контента на ПК */
+    max-width: 1000px; 
     display: flex;
     flex-direction: column;
-    padding: 2vh 2vw; /* Адаптивный отступ */
-    margin: auto; /* Центрирование на ПК */
+    padding: 2vh 2vw; 
+    margin: auto; 
 }
 
 /* Панель статистики */
@@ -176,10 +177,10 @@ body, html {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 3vh; /* Адаптивное позиционирование */
+    bottom: 3vh; 
     z-index: 1001;
     background: url('Images/XMONEY.png') right center no-repeat;
-    background-size: 6vh; /* Размер иконки относительно высоты экрана */
+    background-size: 6vh; 
     padding: 1vh 7vh 1vh 3vw; 
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 20px;
@@ -187,7 +188,7 @@ body, html {
 }
 
 #money-count {
-    font-size: 7vw; /* Крупный адаптивный шрифт */
+    font-size: 7vw; 
     max-font-size: 2.2rem;
     font-weight: bold;
     color: #ffd700;
@@ -195,60 +196,113 @@ body, html {
 }
 
 
-/* Шкала Опыта */
+/* Шкала Опыта и ЭФФЕКТЫ (НОВЫЙ АНИМАЦИЯ) */
 #xp-bar-container {
     width: 90%;
     max-width: 800px;
-    height: 4vh; /* Адаптивная высота */
+    height: 4vh; 
     margin: 2vh auto;
-    /* ... */
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#xp-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0; 
+    background: #8a2be2;
+    border-radius: 20px;
+    transition: width 0.5s ease-out; /* Плавное заполнение */
+    filter: brightness(1.0);
+}
+
+/* Анимация "живого" повышения уровня */
+.level-up-flash {
+    animation: levelFlash 0.3s ease-in-out;
+}
+
+@keyframes levelFlash {
+    0% { filter: brightness(1.5); box-shadow: 0 0 10px #c08cff; }
+    50% { filter: brightness(2.0); box-shadow: 0 0 20px #ff0; }
+    100% { filter: brightness(1.0); box-shadow: none; }
+}
+
+#xp-bar-sparkles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        100deg,
+        rgba(255, 255, 255, 0) 20%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 80%
+    );
+    background-size: 200% 100%;
+    animation: sparkle 3s linear infinite;
 }
 
 #xp-text {
     font-size: 3.5vw;
     max-font-size: 1rem;
-    /* ... */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    text-shadow: 0 0 3px black;
+    z-index: 5;
 }
 
+@keyframes sparkle {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
 
 /* Область клика (персонаж) */
 #click-area {
-    flex-grow: 1; /* Занимает все доступное вертикальное пространство */
+    flex-grow: 1; 
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 #character-image {
-    max-width: 60vw; /* Максимум 60% ширины экрана */
-    max-height: 50vh; /* Максимум 50% высоты экрана */
+    max-width: 60vw; 
+    max-height: 50vh; 
     cursor: pointer;
     transition: transform 0.1s ease;
     filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
 }
 
+/* ФИКС: УДАЛЕНО: #character-image:active { transform: scale(0.97); } - чтобы не было сдвига при клике */
+
 /* Магазин */
 #shop {
     display: flex;
     justify-content: center;
-    gap: 2vw; /* Адаптивный отступ между элементами */
+    gap: 2vw; 
     padding: 2vh;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 15px;
-    /* Убедимся, что магазин не наезжает на нижние элементы */
     margin-bottom: 8vh; 
 }
 
 .shop-item {
-    width: 20vw; /* Адаптивная ширина */
-    max-width: 140px; /* Ограничение для ПК */
+    width: 20vw; 
+    max-width: 140px; 
     padding: 1vh;
     /* ... */
-}
-
-.shop-item img {
-    width: 5vh;
-    height: 5vh;
 }
 /* ... (Остальные стили не изменены) ... */
 
