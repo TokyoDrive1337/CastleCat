@@ -1,14 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. Состояние Игры ---
-    let money = 0;
-    let xp = 0;
-    let level = 1;
-    let selectedClass = '';
-    let currentLang = 'en'; 
+    // --- 1. Состояние Игры (Используем структуру для сохранения) ---
+    let gameState = {
+        selectedClass: '',
+        progress: {
+            'krest': { money: 0, xp: 0, level: 1 },
+            'BOW': { money: 0, xp: 0, level: 1 },
+            'MAG': { money: 0, xp: 0, level: 1 },
+            'krestos': { money: 0, xp: 0, level: 1 },
+        }
+    };
     const xpToNextLevel = 1613;
     let isMusicPlaying = false;
     let lastVolume = 30; 
+    let currentLang = 'en';
 
     // --- 2. Элементы DOM ---
     const dom = {
@@ -21,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         mainMenu: document.getElementById('main-menu'),
         gameScreen: document.getElementById('game-screen'),
-        langSwitcher: document.getElementById('lang-switcher'),
         moneyContainerBottom: document.getElementById('money-container-bottom'), 
         moneyCount: document.getElementById('money-count'), 
         levelDisplay: document.getElementById('current-level'),
@@ -33,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- 3. База данных переводов ---
-    const translations = {
+    const translations = { /* ... (Остались без изменений) ... */
         'en': {
             'click_to_start': 'Click to Start',
             'select_class': 'Select Your Class',
@@ -72,40 +76,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- 4. Основные Функции Игры ---
 
-    function playMusic() {
-        if (!isMusicPlaying) {
-            dom.music.volume = dom.volumeSlider.value / 100;
-            dom.music.play().then(() => {
-                isMusicPlaying = true;
-            }).catch(error => {
-                console.warn("Music play failed.", error);
-            });
+    // --- 4. Функции Сохранения/Загрузки (НОВЫЕ) ---
+
+    function saveGame() {
+        if (gameState.selectedClass) {
+            localStorage.setItem('gameState', JSON.stringify(gameState));
         }
     }
 
-    window.toggleMute = () => {
+    function loadGame() {
+        const savedState = localStorage.getItem('gameState');
+        if (savedState) {
+            gameState = JSON.parse(savedState);
+            // Если сохраненный класс есть, сразу переходим на экран игры
+            if (gameState.selectedClass) {
+                dom.mainMenu.classList.add('hidden');
+                dom.gameScreen.classList.remove('hidden');
+                dom.moneyContainerBottom.classList.remove('hidden'); 
+                updateUI();
+            }
+        }
+    }
+
+    // Вспомогательная функция для получения текущего прогресса персонажа
+    function getCurrentProgress() {
+        return gameState.progress[gameState.selectedClass];
+    }
+
+    // --- 5. Основные Функции Игры (Изменены для работы с gameState) ---
+
+    window.toggleMute = () => { /* ... (без изменений) ... */
         if (dom.music.muted) {
             dom.music.muted = false;
             dom.speakerIcon.src = 'Images/icon_speaker_on.png';
-            
             dom.volumeSlider.value = lastVolume;
             dom.music.volume = lastVolume / 100;
-
         } else {
             lastVolume = dom.volumeSlider.value;
-            
             dom.music.muted = true;
             dom.speakerIcon.src = 'Images/icon_speaker_off.png';
-            
             dom.volumeSlider.value = 0; 
         }
     };
     
-    // --- 5. Слушатели Событий ---
-
-    dom.volumeSlider.addEventListener('input', (e) => {
+    dom.volumeSlider.addEventListener('input', (e) => { /* ... (без изменений) ... */
         const volumeValue = e.target.value;
         const musicVolume = volumeValue / 100;
 
@@ -121,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    window.changeLanguage = (lang) => {
+    window.changeLanguage = (lang) => { /* ... (без изменений) ... */
         currentLang = lang;
         const langData = translations[lang];
         dom.textElements.forEach(el => {
@@ -133,91 +148,116 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.selectClass = (className) => {
-        selectedClass = className;
-        level = 1;
-        xp = 0;
+        gameState.selectedClass = className;
         
+        // Переход к экрану игры
         dom.mainMenu.classList.add('hidden');
         dom.gameScreen.classList.remove('hidden');
         dom.moneyContainerBottom.classList.remove('hidden'); 
         
         updateUI();
+        saveGame();
     };
 
     window.handleClick = () => {
+        const currentProgress = getCurrentProgress();
         const reward = getCoinReward();
-        money += reward;
+        currentProgress.money += reward;
+        
         showFloatingText(`+${reward.toFixed(1)}`, 'coin');
         updateUI();
+        saveGame(); // Сохраняем после каждого клика
     };
 
-    function getCoinReward() {
-        const rand = Math.random() * 100; 
-        if (rand < 4) { return 0.2; }
-        else if (rand < 9) { return 20.0; }
-        else { return getRandomInt(5, 16) + Math.random(); }
-    }
-
     window.buyItem = (item) => {
+        const currentProgress = getCurrentProgress();
         let cost = 0;
         let xpGain = 0;
 
         switch (item) {
-            case 'food':
-                cost = 10;
-                if (money >= cost) xpGain = getRandomInt(5, 10);
-                break;
-            case 'water':
-                cost = 16;
-                if (money >= cost) xpGain = getRandomInt(10, 16);
-                break;
-            case 'herb':
-                cost = 23;
-                if (money >= cost) xpGain = getRandomInt(26, 60);
-                break;
+            // ... (логика определения cost и xpGain не изменена)
+            case 'food': cost = 10; if (currentProgress.money >= cost) xpGain = getRandomInt(5, 10); break;
+            case 'water': cost = 16; if (currentProgress.money >= cost) xpGain = getRandomInt(10, 16); break;
+            case 'herb': cost = 23; if (currentProgress.money >= cost) xpGain = getRandomInt(26, 60); break;
         }
 
         if (xpGain > 0) {
-            money -= cost;
-            xp += xpGain;
+            currentProgress.money -= cost;
+            currentProgress.xp += xpGain;
             showFloatingText(`+${xpGain} XP`, 'xp');
             checkLevelUp();
             updateUI();
-        } else if (cost > 0 && money < cost) {
+            saveGame(); // Сохраняем после покупки
+        } else if (cost > 0 && currentProgress.money < cost) {
             console.log("Not enough money");
         }
     };
 
     function checkLevelUp() {
-        while (xp >= xpToNextLevel) { 
-            if (level < 5) {
-                level++;
-                xp -= xpToNextLevel; 
+        const currentProgress = getCurrentProgress();
+        const oldLevel = currentProgress.level;
+
+        while (currentProgress.xp >= xpToNextLevel) { 
+            if (currentProgress.level < 5) {
+                currentProgress.level++;
+                currentProgress.xp -= xpToNextLevel; 
             } else {
-                xp = xpToNextLevel; 
+                currentProgress.xp = xpToNextLevel; 
                 break; 
             }
+        }
+        
+        // Активируем эффект при повышении уровня
+        if (currentProgress.level > oldLevel) {
+            dom.xpBarFill.classList.add('level-up-flash');
+            setTimeout(() => {
+                dom.xpBarFill.classList.remove('level-up-flash');
+            }, 300);
         }
     }
 
     function updateUI() {
-        dom.moneyCount.textContent = money.toFixed(1);
-        dom.levelDisplay.textContent = level;
-        dom.characterImage.src = `Images/${selectedClass}${level}.png`;
+        const currentProgress = getCurrentProgress();
         
-        let xpPercent = (xp / xpToNextLevel) * 100;
+        dom.moneyCount.textContent = currentProgress.money.toFixed(1);
+        dom.levelDisplay.textContent = currentProgress.level;
         
-        if (level === 5) {
+        // Обновление картинки и XP Bar
+        dom.characterImage.src = `Images/${gameState.selectedClass}${currentProgress.level}.png`;
+        
+        let xpPercent = (currentProgress.xp / xpToNextLevel) * 100;
+        
+        if (currentProgress.level === 5) {
             xpPercent = 100;
             dom.xpText.textContent = "MAX LEVEL";
         } else {
-            dom.xpText.textContent = `${Math.floor(xp)} / ${xpToNextLevel} (${xpPercent.toFixed(0)}%)`;
+            dom.xpText.textContent = `${Math.floor(currentProgress.xp)} / ${xpToNextLevel} (${xpPercent.toFixed(0)}%)`;
         }
         
         dom.xpBarFill.style.width = `${xpPercent}%`;
     }
 
-    function showFloatingText(text, type) {
+    // ... (остальные вспомогательные функции: playMusic, getCoinReward, showFloatingText, getRandomInt)
+
+    function getCoinReward() { /* ... */
+        const rand = Math.random() * 100; 
+        if (rand < 4) { return 0.2; }
+        else if (rand < 9) { return 20.0; }
+        else { return getRandomInt(5, 16) + Math.random(); }
+    }
+    
+    function playMusic() { /* ... */
+        if (!isMusicPlaying) {
+            dom.music.volume = dom.volumeSlider.value / 100;
+            dom.music.play().then(() => {
+                isMusicPlaying = true;
+            }).catch(error => {
+                console.warn("Music play failed.", error);
+            });
+        }
+    }
+    
+    function showFloatingText(text, type) { /* ... */
         const el = document.createElement('div');
         el.className = `floating-text ${type}`;
         el.textContent = text;
@@ -237,6 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 6. Инициализация ---
     
+    loadGame(); // Загружаем прогресс при старте
     changeLanguage(currentLang);
 
     dom.startOverlay.addEventListener('click', () => {
