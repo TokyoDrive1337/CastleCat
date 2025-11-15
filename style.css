@@ -1,12 +1,39 @@
-/* ... (Общие стили, @keyframes pulse - без изменений) ... */
+/* Экран "Нажми, чтобы начать" */
+#start-overlay {
+    /* ... (стили не изменены) */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+#start-overlay h1 {
+    font-size: 3rem;
+    color: white;
+    text-shadow: 0 0 15px white, 0 0 25px white;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
 
 /* Глобальные стили */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    /* Убираем синюю обводку при фокусе/клике */
-    -webkit-tap-highlight-color: transparent; 
 }
 
 body, html {
@@ -28,171 +55,153 @@ body, html {
 }
 
 /* ==========================================
-  АДАПТИВНЫЕ ПЛАВАЮЩИЕ ЭЛЕМЕНТЫ
+  ИСПРАВЛЕННЫЕ СТИЛИ: Управление Музыкой
+  (Теперь в левом нижнем углу)
   ==========================================
 */
-
-/* 1. Управление Музыкой (НИЗ-ЛЕВО) */
 #music-controls {
     position: absolute;
-    bottom: 2vh; 
-    left: 2vw;   
+    /* ИСПРАВЛЕНО: Снизу */
+    bottom: 20px; 
+    left: 20px;
     z-index: 100;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 0.8vh 1.5vw; 
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 12px;
     border-radius: 10px;
     display: flex; 
     align-items: center;
-    gap: 10px; 
+    gap: 15px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-#music-controls button img {
-    width: 3vh; 
-    height: 3vh; 
+#mute-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+#speaker-icon {
+    width: 30px;
+    height: 30px;
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    transition: opacity 0.2s;
+}
+
+#mute-btn:hover #speaker-icon {
+    opacity: 0.7;
 }
 
 #volume-slider {
-    width: 10vw; 
-    max-width: 80px; 
-}
-
-
-/* 2. Переключатель Языка (ВЕРХ-ПРАВО) */
-#lang-menu-container {
-    position: absolute;
-    top: 2vh; 
-    right: 2vw; 
-    z-index: 150;
-    text-align: right;
-}
-
-#lang-toggle-btn {
-    background: rgba(0, 0, 0, 0.4);
-    border: none;
-    padding: 0.8vh;
-    border-radius: 8px;
+    width: 80px;
     cursor: pointer;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    transition: background 0.2s;
-}
-
-#current-flag {
-    width: 3.5vh; 
-    height: 2.5vh; 
-    vertical-align: middle;
-    border-radius: 3px;
-}
-
-/* ФИКС: Исправлено позиционирование и отображение выпадающего меню */
-#lang-switcher {
-    position: absolute;
-    top: 100%; /* Начинается прямо под кнопкой */
-    right: 0;
-    margin-top: 5px;
-    background: rgba(0, 0, 0, 0.8); /* Более темный фон для контраста */
-    padding: 5px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    
-    /* Скрыто по умолчанию */
-    opacity: 0; 
-    visibility: hidden; /* Добавлен visibility для предотвращения кликов */
-    transition: opacity 0.3s, visibility 0.3s;
-}
-
-#lang-switcher.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-#lang-switcher img {
-    width: 4vh;
-    height: 3vh;
-    cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-    transition: border-color 0.1s;
 }
 /* ======================================== */
 
 
-/* Главное меню (Выбор персонажа) */
+/* Переключатель языков */
+#lang-switcher {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 5px;
+    border-radius: 10px;
+}
+
+#lang-switcher img {
+    width: 40px;
+    height: 30px;
+    cursor: pointer;
+    margin-left: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+#lang-switcher img:hover {
+    transform: scale(1.1);
+    border-color: white;
+}
+
+/* Главное меню */
 #main-menu {
     width: 90%;
-    max-width: 800px; 
-    padding: 3vh; 
+    max-width: 1000px;
+    padding: 40px;
     text-align: center;
     background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(8px); 
-    border-radius: 15px; 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #main-menu h2 {
-    font-size: 5vw; 
-    max-font-size: 2rem;
-    margin-bottom: 2vh; 
+    font-size: 2.5rem;
+    margin-bottom: 30px;
 }
 
 .class-selection {
     display: flex;
-    justify-content: center;
-    gap: 1.5vw; 
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
 .class-btn {
-    width: 18vw; 
-    max-width: 150px; 
-    padding: 1vh; 
-    background-color: transparent; /* ФИКС ФОНА */
-    border: none;
-    box-shadow: none;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 20px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    width: 200px;
+}
+
+.class-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
 }
 
 .class-btn img {
-    width: 12vw; 
-    height: 12vw; 
-    max-width: 100px;
-    max-height: 100px;
-    /* АГРЕССИВНЫЙ ФИКС: Убираем белый фон PNG */
-    background: transparent;
-    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); 
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
 }
 
 .class-btn span {
-    font-size: 2.5vw; 
-    max-font-size: 1rem;
+    font-size: 1.2rem;
+    color: white;
+    font-weight: bold;
 }
-
 
 /* Игровой экран */
 #game-screen {
     width: 100%;
     height: 100%;
-    max-width: 900px; 
     display: flex;
     flex-direction: column;
-    padding: 2vh 2vw; 
-    padding-top: 8vh; /* Увеличен, чтобы XP Bar не наезжал на язык */
-    margin: auto; 
+    padding: 20px;
 }
 
 /* Панель статистики */
 #stats-bar {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
     width: 100%;
-    padding: 0.8vh 1.5vw; 
+    padding: 10px 20px;
     background: rgba(0, 0, 0, 0.4);
     border-radius: 15px;
 }
 
 #level-display {
-    font-size: 3.5vw; 
-    max-font-size: 1.2rem;
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
 
@@ -201,83 +210,164 @@ body, html {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 2vh; 
+    bottom: 20px;
     z-index: 1001;
-    /* ... (Стили монет без изменений) ... */
     background: url('Images/XMONEY.png') right center no-repeat;
-    background-size: 5vh; 
-    padding: 0.8vh 6vh 0.8vh 2vw; 
+    background-size: 50px;
+    padding: 10px 65px 10px 20px;
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 20px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
 #money-count {
-    font-size: 5vw; 
-    max-font-size: 1.8rem;
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700, 0 0 20px #ffae00;
 }
 
 
 /* Шкала Опыта */
 #xp-bar-container {
     width: 90%;
-    max-width: 700px; 
-    height: 3.5vh; 
-    margin: 1.5vh auto; 
-    /* ... (Остальные стили XP Bar - без изменений) ... */
+    max-width: 800px;
+    height: 40px;
+    margin: 20px auto;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+#xp-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0; 
+    background: #8a2be2;
+    border-radius: 20px;
+    transition: width 0.5s ease-out;
+}
 
-/* Область клика (персонаж) */
-#click-area {
-    flex-grow: 1; 
+#xp-bar-sparkles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        100deg,
+        rgba(255, 255, 255, 0) 20%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 80%
+    );
+    background-size: 200% 100%;
+    animation: sparkle 3s linear infinite;
+}
+
+#xp-text {
+    position: absolute;
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    /* ФИКС СДВИГА: предотвращаем обработку прикосновений, чтобы не было сдвига */
-    user-select: none;
-    touch-action: manipulation;
+    font-weight: bold;
+    font-size: 1rem;
+    text-shadow: 0 0 3px black;
+    z-index: 5;
+}
+
+@keyframes sparkle {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Область клика (персонаж) */
+#click-area {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #character-image {
-    max-width: 50vw; 
+    max-width: 300px;
     max-height: 40vh; 
     cursor: pointer;
-    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-    transition: none; /* Убираем любые плавные переходы, чтобы исключить сдвиг */
+    transition: transform 0.1s ease;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
 }
 
-/* ФИКС СДВИГА: Гарантия, что при клике нет трансформаций */
-#character-image:active, #character-image:focus {
-    transform: none !important;
-    outline: none !important;
+#character-image:active {
+    transform: scale(0.97);
 }
-
 
 /* Магазин */
 #shop {
     display: flex;
     justify-content: center;
-    gap: 1.5vw; 
-    padding: 1.5vh; 
+    gap: 20px;
+    padding: 20px;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 15px;
-    margin-bottom: 6vh; 
+    margin-bottom: 60px; 
 }
 
 .shop-item {
-    width: 18vw; 
-    max-width: 120px; 
-    padding: 0.8vh; 
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    color: white;
+    width: 140px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
 }
 
-.shop-item img {
-    width: 4vh; 
-    height: 4vh; 
+.shop-item img { width: 60px; height: 60px; }
+.shop-item span { font-weight: bold; }
+.shop-item .item-desc { font-size: 0.8rem; font-weight: normal; color: #ccc; }
+.shop-item .item-cost { font-size: 0.9rem; font-weight: bold; color: #ffd700; }
+
+#item-food:hover { box-shadow: 0 0 15px 5px #ff69b4; transform: translateY(-5px); }
+#item-water:hover { box-shadow: 0 0 15px 5px #00bfff; transform: translateY(-5px); }
+#item-herb:hover { box-shadow: 0 0 15px 5px #32cd32; transform: translateY(-5px); }
+
+/* Всплывающий текст */
+#floating-text-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    pointer-events: none; 
 }
 
-.shop-item span {
-    font-size: 2.5vw; 
-    max-font-size: 0.9rem;
+.floating-text {
+    position: absolute;
+    font-size: 1.5rem;
+    font-weight: bold;
+    animation: fadeUp 1s ease-out forwards;
 }
 
-/* ... (Стили floating-text и .hidden - без изменений) ... */
+.floating-text.coin { color: #ffd700; text-shadow: 0 0 5px #ffae00; }
+.floating-text.xp { color: #8a2be2; text-shadow: 0 0 5px #c08cff; }
+
+@keyframes fadeUp {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-80px); }
+}
+
+.hidden {
+    display: none !important;
+}
