@@ -6,12 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let level = 1;
     let selectedClass = '';
     let currentLang = 'en'; 
-    // ИЗМЕНЕНИЕ 3: Более реалистичная прогрессия XP (для примера)
-    // Функция для расчета XP: 1000 + (level * 100) + Math.pow(level, 2) * 50;
     const getXpToNextLevel = (lvl) => 1000 + (lvl * 100) + Math.pow(lvl, 2) * 50; 
     let xpNeededForCurrentLevel = getXpToNextLevel(1); 
     let isMusicPlaying = false;
     let lastVolume = 30; 
+    const MAX_LEVEL = 5;
 
     // --- 2. Элементы DOM ---
     const dom = {
@@ -27,12 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
         langSwitcher: document.getElementById('lang-switcher'),
         moneyContainerBottom: document.getElementById('money-container-bottom'), 
         moneyCount: document.getElementById('money-count'), 
-        levelDisplay: document.getElementById('current-level'),
-        xpBarContainer: document.getElementById('xp-bar-container'), // Добавлено
+        xpBarContainer: document.getElementById('xp-bar-container'), 
         xpBarFill: document.getElementById('xp-bar-fill'),
         xpText: document.getElementById('xp-text'),
         characterImage: document.getElementById('character-image'),
         floatingTextContainer: document.getElementById('floating-text-container'),
+        saveIndicator: document.getElementById('save-indicator'), // Добавлено
         textElements: document.querySelectorAll('[data-lang]')
     };
 
@@ -75,8 +74,56 @@ document.addEventListener('DOMContentLoaded', () => {
             'item_herb_name': 'Чарівна Трава', 'item_herb_desc': 'Дає 26-60 ДС',
         }
     };
+    
+    // --- 4. Функции Сохранения/Загрузки ---
+    
+    function saveGame() {
+        const gameState = {
+            money: money,
+            xp: xp,
+            level: level,
+            selectedClass: selectedClass,
+            xpNeeded: xpNeededForCurrentLevel,
+            currentLang: currentLang
+        };
+        localStorage.setItem('gameSave', JSON.stringify(gameState));
+        
+        // Показать индикатор сохранения
+        dom.saveIndicator.classList.remove('hidden');
+        setTimeout(() => {
+            dom.saveIndicator.classList.add('hidden');
+        }, 500);
+    }
 
-    // --- 4. Основные Функции Игры ---
+    function loadGame() {
+        const savedData = localStorage.getItem('gameSave');
+        if (savedData) {
+            const gameState = JSON.parse(savedData);
+            money = gameState.money || 0;
+            xp = gameState.xp || 0;
+            level = gameState.level || 1;
+            selectedClass = gameState.selectedClass || '';
+            xpNeededForCurrentLevel = gameState.xpNeeded || getXpToNextLevel(level);
+            currentLang = gameState.currentLang || 'en';
+            
+            // Если класс выбран, сразу показываем игровой экран
+            if (selectedClass) {
+                dom.startOverlay.style.display = 'none'; 
+                dom.mainMenu.classList.add('hidden');
+                dom.gameScreen.classList.remove('hidden');
+                dom.moneyContainerBottom.classList.remove('hidden');
+            }
+            
+            // Применяем язык и обновляем UI
+            changeLanguage(currentLang, true); 
+            updateUI(); 
+            return true;
+        }
+        changeLanguage(currentLang, true); // Применяем язык по умолчанию
+        return false;
+    }
+
+    // --- 5. Основные Функции Игры ---
 
     function playMusic() {
         if (!isMusicPlaying) {
@@ -93,22 +140,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (dom.music.muted) {
             dom.music.muted = false;
             dom.speakerIcon.src = 'Images/icon_speaker_on.png';
-            
             dom.volumeSlider.value = lastVolume;
             dom.music.volume = lastVolume / 100;
 
         } else {
             lastVolume = dom.volumeSlider.value;
-            
             dom.music.muted = true;
             dom.speakerIcon.src = 'Images/icon_speaker_off.png';
-            
             dom.volumeSlider.value = 0; 
         }
     };
     
-    // --- 5. Слушатели Событий ---
-
     dom.volumeSlider.addEventListener('input', (e) => {
         const volumeValue = e.target.value;
         const musicVolume = volumeValue / 100;
@@ -125,8 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ИЗМЕНЕНИЕ 4: Функция переключения языка
-    window.changeLanguage = (lang) => {
+    window.changeLanguage = (lang, skipSave = false) => {
         currentLang = lang;
         const langData = translations[lang];
         dom.textElements.forEach(el => {
@@ -135,21 +176,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.textContent = langData[key];
             }
         });
-        // Дополнительно обновляем XP-текст при смене языка
         updateXPDisplay(true); 
+        if (!skipSave) saveGame();
     };
 
     window.selectClass = (className) => {
         selectedClass = className;
+        // Сброс, если это действительно новый старт, а не загрузка
         level = 1;
         xp = 0;
-        xpNeededForCurrentLevel = getXpToNextLevel(1); // Инициализация XP для 1 уровня
+        xpNeededForCurrentLevel = getXpToNextLevel(1); 
         
         dom.mainMenu.classList.add('hidden');
         dom.gameScreen.classList.remove('hidden');
         dom.moneyContainerBottom.classList.remove('hidden'); 
         
         updateUI();
+        saveGame();
     };
 
     window.handleClick = () => {
@@ -157,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         money += reward;
         showFloatingText(`+${reward.toFixed(1)}`, 'coin');
         updateUI();
+        saveGame();
     };
 
     function getCoinReward() {
@@ -180,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (money >= cost) xpGain = getRandomInt(10, 16);
                 break;
             case 'herb':
-                cost = 23;
+                cost = 160; // УВЕЛИЧЕННАЯ ЦЕНА
                 if (money >= cost) xpGain = getRandomInt(26, 60);
                 break;
         }
@@ -191,65 +235,60 @@ document.addEventListener('DOMContentLoaded', () => {
             showFloatingText(`+${xpGain} XP`, 'xp');
             checkLevelUp();
             updateUI();
+            saveGame();
         } else if (cost > 0 && money < cost) {
-            // Можно добавить сообщение о недостатке денег
             showFloatingText(translations[currentLang]['cost'] + ' x', 'coin');
         }
     };
 
-    // ИЗМЕНЕНИЕ 3: Обновленная логика повышения уровня
     function checkLevelUp() {
-        // Уровень MAX_LEVEL (например, 5)
-        const MAX_LEVEL = 5; 
         let leveledUp = false;
 
         while (xp >= xpNeededForCurrentLevel && level < MAX_LEVEL) { 
             level++;
-            // Вычитаем только то XP, что нужно было для прошлого уровня
             xp -= xpNeededForCurrentLevel; 
-            xpNeededForCurrentLevel = getXpToNextLevel(level); // Расчет XP для следующего уровня
+            xpNeededForCurrentLevel = getXpToNextLevel(level); 
             leveledUp = true;
         }
         
-        // Если достигнут MAX_LEVEL
         if (level === MAX_LEVEL && xp > xpNeededForCurrentLevel) {
-             xp = xpNeededForCurrentLevel;
+              xp = xpNeededForCurrentLevel;
         }
 
         if (leveledUp) {
-            // Добавляем эффект повышения уровня (можно создать отдельную анимацию)
-            console.log(`Leveled Up! New Level: ${level}`);
-            showFloatingText(`LEVEL UP! ${level}`, 'xp');
+            showFloatingText(`${translations[currentLang]['level'].toUpperCase()} UP! ${level}`, 'xp');
         }
+        saveGame();
     }
 
-    // ИЗМЕНЕНИЕ 3: Функция обновления интерфейса XP
     function updateXPDisplay(forceUpdate = false) {
-        const MAX_LEVEL = 5;
         let xpPercent;
         
+        const levelText = translations[currentLang]['level'] || "Level";
+
         if (level >= MAX_LEVEL) {
             xpPercent = 100;
-            // Получаем перевод для "MAX LEVEL"
-            const maxLevelText = translations[currentLang]['level'] ? translations[currentLang]['level'] + ' MAX' : "MAX LEVEL";
-            dom.xpText.textContent = maxLevelText;
+            dom.xpText.textContent = `${levelText} MAX`;
         } else {
             xpPercent = (xp / xpNeededForCurrentLevel) * 100;
-            dom.xpText.textContent = `${Math.floor(xp)} / ${xpNeededForCurrentLevel} (${xpPercent.toFixed(0)}%)`;
+            // ОБЪЕДИНЕННАЯ СТРОКА УРОВЕНЬ И ПРОГРЕСС
+            dom.xpText.textContent = `${levelText} ${level}: ${Math.floor(xp)} / ${xpNeededForCurrentLevel} (${xpPercent.toFixed(0)}%)`;
         }
 
-        // Плавное заполнение шкалы
         dom.xpBarFill.style.width = `${xpPercent}%`;
+        
+        // Эффект "живой воды": переключение анимации дрожания
+        if (xpPercent > 0 && xpPercent < 100) {
+            dom.xpBarContainer.classList.remove('idle-wave');
+        } else {
+            dom.xpBarContainer.classList.add('idle-wave');
+        }
     }
 
     function updateUI() {
         dom.moneyCount.textContent = money.toFixed(1);
-        dom.levelDisplay.textContent = level;
-        
-        // Эта строка отвечает за отображение картинки персонажа
         dom.characterImage.src = `Images/${selectedClass}${level}.png`;
-        
-        updateXPDisplay(); // Обновление шкалы XP
+        updateXPDisplay(); 
     }
 
     function showFloatingText(text, type) {
@@ -257,7 +296,6 @@ document.addEventListener('DOMContentLoaded', () => {
         el.className = `floating-text ${type}`;
         el.textContent = text;
         
-        // Рандомное позиционирование вокруг центра
         const randomX = getRandomInt(-50, 50); 
         const randomY = getRandomInt(-50, 50);
         
@@ -279,11 +317,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 6. Инициализация ---
     
-    changeLanguage(currentLang);
+    loadGame();
 
     dom.startOverlay.addEventListener('click', () => {
         playMusic(); 
         dom.startOverlay.style.display = 'none'; 
+        
+        if (!selectedClass) {
+            dom.mainMenu.classList.remove('hidden');
+        }
+
     }, { once: true }); 
 
 });
