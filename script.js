@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         textElements: document.querySelectorAll('[data-lang]')
     };
 
-    // --- 3. База данных переводов (Ключи соответствуют исправленному HTML) ---
+    // --- 3. База данных переводов ---
     const translations = {
         'en': {
             'click_to_start': 'Click to Start',
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         'ru': {
             'click_to_start': 'Нажмите, чтобы Начать',
-            'select_class': 'Выберите Ваш Класс',
+            'select_class': 'Выберите Ваш Класc',
             'class_peasant': 'Крестьянин', 'class_archer': 'Лучник', 'class_mage': 'Маг', 'class_crusader': 'Крестоносец',
             'level': 'Уровень', 'cost': 'Цена',
             'item_food_name': 'Еда', 'item_food_desc': 'Дает 5-10 ОП',
@@ -203,8 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateUI() {
         dom.moneyCount.textContent = money.toFixed(1);
         dom.levelDisplay.textContent = level;
-        
-        // Эта строка отвечает за отображение картинки персонажа
         dom.characterImage.src = `Images/${selectedClass}${level}.png`;
         
         let xpPercent = (xp / xpToNextLevel) * 100;
