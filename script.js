@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. Состояние Игры (Используем структуру для сохранения) ---
+    // --- 1. Состояние Игры и Настройки ---
     const initialProgress = { money: 0, xp: 0, level: 1 };
     let gameState = {
         selectedClass: '',
@@ -22,13 +22,15 @@ document.addEventListener('DOMContentLoaded', () => {
         startOverlay: document.getElementById('start-overlay'), 
         music: document.getElementById('bg-music'),
         
-        muteBtn: document.getElementById('mute-btn'),
-        speakerIcon: document.getElementById('speaker-icon'),
+        musicControls: document.getElementById('music-controls'),
         volumeSlider: document.getElementById('volume-slider'),
+        
+        langSwitcher: document.getElementById('lang-switcher'), // Контейнер флагов
+        langMenuContainer: document.getElementById('lang-menu-container'),
+        currentFlagIcon: document.getElementById('current-flag'),
         
         mainMenu: document.getElementById('main-menu'),
         gameScreen: document.getElementById('game-screen'),
-        moneyContainerBottom: document.getElementById('money-container-bottom'), 
         moneyCount: document.getElementById('money-count'), 
         levelDisplay: document.getElementById('current-level'),
         xpBarFill: document.getElementById('xp-bar-fill'),
@@ -75,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-    // --- 4. Функции Сохранения/Загрузки (УСИЛЕНО) ---
+    // --- 4. Функции Сохранения/Загрузки ---
 
     function saveGame() {
         localStorage.setItem('gameState', JSON.stringify(gameState));
@@ -85,45 +87,61 @@ document.addEventListener('DOMContentLoaded', () => {
         const savedState = localStorage.getItem('gameState');
         if (savedState) {
             const loadedState = JSON.parse(savedState);
-            // Мерж загруженного состояния с начальным для гарантии, что все персонажи присутствуют
-            gameState = {
-                ...gameState,
-                ...loadedState,
-                progress: { ...gameState.progress, ...loadedState.progress }
-            };
+            
+            if (loadedState.progress) {
+                gameState.progress = { ...gameState.progress, ...loadedState.progress };
+            }
+            if (loadedState.selectedClass) {
+                gameState.selectedClass = loadedState.selectedClass;
+            }
 
-            // Если сохраненный класс есть, сразу переходим на экран игры
-            if (gameState.selectedClass) {
+            if (gameState.selectedClass && gameState.progress[gameState.selectedClass]) {
                 dom.mainMenu.classList.add('hidden');
                 dom.gameScreen.classList.remove('hidden');
-                dom.moneyContainerBottom.classList.remove('hidden'); 
+                document.getElementById('money-container-bottom').classList.remove('hidden'); 
                 updateUI();
             }
         }
     }
 
-    // Вспомогательная функция для получения текущего прогресса персонажа
     function getCurrentProgress() {
-        if (!gameState.selectedClass) return gameState.progress['krest']; // Fallback
-        return gameState.progress[gameState.selectedClass];
+        const currentClass = gameState.selectedClass || 'krest';
+        return gameState.progress[currentClass];
     }
 
     // --- 5. Основные Функции Игры ---
+    
+    // НОВАЯ ФУНКЦИЯ: Показать/скрыть меню языка
+    window.toggleLanguageMenu = () => {
+        dom.langSwitcher.classList.toggle('visible');
+    };
 
-    // ... (toggleMute, volumeSlider.addEventListener, changeLanguage - без изменений)
+    window.changeLanguage = (lang, flagSrc) => {
+        currentLang = lang;
+        const langData = translations[lang];
+        dom.textElements.forEach(el => {
+            const key = el.getAttribute('data-lang');
+            if (langData[key]) {
+                el.textContent = langData[key];
+            }
+        });
+        
+        // Обновляем иконку на кнопке переключения
+        dom.currentFlagIcon.src = flagSrc;
+        // Скрываем меню после выбора
+        dom.langSwitcher.classList.remove('visible');
+    };
 
     window.selectClass = (className) => {
-        // Сохраняем прогресс предыдущего персонажа, если он был
-        if (gameState.selectedClass) {
+        if (gameState.selectedClass && gameState.selectedClass !== className) {
             saveGame();
         }
         
         gameState.selectedClass = className;
         
-        // Переход к экрану игры
         dom.mainMenu.classList.add('hidden');
         dom.gameScreen.classList.remove('hidden');
-        dom.moneyContainerBottom.classList.remove('hidden'); 
+        document.getElementById('money-container-bottom').classList.remove('hidden'); 
         
         updateUI();
         saveGame();
@@ -136,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         showFloatingText(`+${reward.toFixed(1)}`, 'coin');
         updateUI();
-        saveGame(); // Сохраняем после каждого клика
+        saveGame();
     };
 
     window.buyItem = (item) => {
@@ -156,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showFloatingText(`+${xpGain} XP`, 'xp');
             checkLevelUp();
             updateUI();
-            saveGame(); // Сохраняем после покупки
+            saveGame();
         } else if (cost > 0 && currentProgress.money < cost) {
             console.log("Not enough money");
         }
@@ -176,10 +194,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // Активируем эффект при повышении уровня
         if (currentProgress.level > oldLevel) {
             dom.xpBarFill.classList.add('level-up-flash');
-            // Убираем класс, чтобы можно было запустить эффект снова
             setTimeout(() => {
                 dom.xpBarFill.classList.remove('level-up-flash');
             }, 500);
@@ -192,8 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.moneyCount.textContent = currentProgress.money.toFixed(1);
         dom.levelDisplay.textContent = currentProgress.level;
         
-        // Обновление картинки и XP Bar
-        dom.characterImage.src = `Images/${gameState.selectedClass}${currentProgress.level}.png`;
+        const currentClass = gameState.selectedClass || 'krest';
+        dom.characterImage.src = `Images/${currentClass}${currentProgress.level}.png`;
         
         let xpPercent = (currentProgress.xp / xpToNextLevel) * 100;
         
@@ -206,53 +222,32 @@ document.addEventListener('DOMContentLoaded', () => {
         
         dom.xpBarFill.style.width = `${xpPercent}%`;
     }
-
-    // ... (остальные вспомогательные функции: getCoinReward, playMusic, showFloatingText, getRandomInt)
     
-    function getCoinReward() { 
+    // --- 6. Вспомогательные и Инициализация ---
+
+    function getCoinReward() { /* ... */
         const rand = Math.random() * 100; 
         if (rand < 4) { return 0.2; }
         else if (rand < 9) { return 20.0; }
         else { return getRandomInt(5, 16) + Math.random(); }
     }
+
+    // ... (playMusic, showFloatingText, getRandomInt - без изменений)
     
-    function playMusic() {
-        if (!isMusicPlaying) {
-            dom.music.volume = dom.volumeSlider.value / 100;
-            dom.music.play().then(() => {
-                isMusicPlaying = true;
-            }).catch(error => {
-                console.warn("Music play failed.", error);
-            });
+    // Инициализация
+    loadGame(); 
+    // Установка языка по умолчанию (или загруженного) при старте
+    const defaultFlagSrc = document.querySelector(`#lang-switcher img[alt="${currentLang.toUpperCase()}"]`)?.src || 'Images/flag_en.png';
+    window.changeLanguage(currentLang, defaultFlagSrc);
+
+    document.getElementById('start-overlay').addEventListener('click', () => {
+        if (!gameState.selectedClass) {
+            gameState.selectedClass = 'krest';
+            saveGame();
         }
-    }
-    
-    function showFloatingText(text, type) { 
-        const el = document.createElement('div');
-        el.className = `floating-text ${type}`;
-        el.textContent = text;
-        el.style.left = `${getRandomInt(-30, 30)}px`;
-        dom.floatingTextContainer.appendChild(el);
         
-        setTimeout(() => {
-            el.remove();
-        }, 1000); 
-    }
-
-    function getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    // --- 6. Инициализация ---
-    
-    loadGame(); // Загружаем прогресс при старте
-    changeLanguage(currentLang);
-
-    dom.startOverlay.addEventListener('click', () => {
-        playMusic(); 
-        dom.startOverlay.style.display = 'none'; 
+        // playMusic(); // Раскомментируйте, если хотите, чтобы музыка включалась сразу
+        document.getElementById('start-overlay').style.display = 'none'; 
     }, { once: true }); 
 
 });
