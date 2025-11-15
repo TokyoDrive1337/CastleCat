@@ -1,0 +1,373 @@
+/* Экран "Нажми, чтобы начать" */
+#start-overlay {
+    /* ... (стили не изменены) */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+#start-overlay h1 {
+    font-size: 3rem;
+    color: white;
+    text-shadow: 0 0 15px white, 0 0 25px white;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Глобальные стили */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body, html {
+    height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    overflow: hidden; 
+}
+
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: url('Images/BCG.png') center center no-repeat;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ==========================================
+  ИСПРАВЛЕННЫЕ СТИЛИ: Управление Музыкой
+  (Теперь в левом нижнем углу)
+  ==========================================
+*/
+#music-controls {
+    position: absolute;
+    /* ИСПРАВЛЕНО: Снизу */
+    bottom: 20px; 
+    left: 20px;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 12px;
+    border-radius: 10px;
+    display: flex; 
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#mute-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+#speaker-icon {
+    width: 30px;
+    height: 30px;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    transition: opacity 0.2s;
+}
+
+#mute-btn:hover #speaker-icon {
+    opacity: 0.7;
+}
+
+#volume-slider {
+    width: 80px;
+    cursor: pointer;
+}
+/* ======================================== */
+
+
+/* Переключатель языков */
+#lang-switcher {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 5px;
+    border-radius: 10px;
+}
+
+#lang-switcher img {
+    width: 40px;
+    height: 30px;
+    cursor: pointer;
+    margin-left: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+#lang-switcher img:hover {
+    transform: scale(1.1);
+    border-color: white;
+}
+
+/* Главное меню */
+#main-menu {
+    width: 90%;
+    max-width: 1000px;
+    padding: 40px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#main-menu h2 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+}
+
+.class-selection {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.class-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 200px;
+}
+
+.class-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+}
+
+.class-btn img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.class-btn span {
+    font-size: 1.2rem;
+    color: white;
+    font-weight: bold;
+}
+
+/* Игровой экран */
+#game-screen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+/* Панель статистики */
+#stats-bar {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
+    width: 100%;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 15px;
+}
+
+#level-display {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+
+/* Контейнер Монет внизу */
+#money-container-bottom {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 20px;
+    z-index: 1001;
+    background: url('Images/XMONEY.png') right center no-repeat;
+    background-size: 50px;
+    padding: 10px 65px 10px 20px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+#money-count {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700, 0 0 20px #ffae00;
+}
+
+
+/* Шкала Опыта */
+#xp-bar-container {
+    width: 90%;
+    max-width: 800px;
+    height: 40px;
+    margin: 20px auto;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#xp-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0; 
+    background: #8a2be2;
+    border-radius: 20px;
+    transition: width 0.5s ease-out;
+}
+
+#xp-bar-sparkles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        100deg,
+        rgba(255, 255, 255, 0) 20%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 80%
+    );
+    background-size: 200% 100%;
+    animation: sparkle 3s linear infinite;
+}
+
+#xp-text {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1rem;
+    text-shadow: 0 0 3px black;
+    z-index: 5;
+}
+
+@keyframes sparkle {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Область клика (персонаж) */
+#click-area {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#character-image {
+    max-width: 300px;
+    max-height: 40vh; 
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
+}
+
+#character-image:active {
+    transform: scale(0.97);
+}
+
+/* Магазин */
+#shop {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    margin-bottom: 60px; 
+}
+
+.shop-item {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    color: white;
+    width: 140px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.shop-item img { width: 60px; height: 60px; }
+.shop-item span { font-weight: bold; }
+.shop-item .item-desc { font-size: 0.8rem; font-weight: normal; color: #ccc; }
+.shop-item .item-cost { font-size: 0.9rem; font-weight: bold; color: #ffd700; }
+
+#item-food:hover { box-shadow: 0 0 15px 5px #ff69b4; transform: translateY(-5px); }
+#item-water:hover { box-shadow: 0 0 15px 5px #00bfff; transform: translateY(-5px); }
+#item-herb:hover { box-shadow: 0 0 15px 5px #32cd32; transform: translateY(-5px); }
+
+/* Всплывающий текст */
+#floating-text-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    pointer-events: none; 
+}
+
+.floating-text {
+    position: absolute;
+    font-size: 1.5rem;
+    font-weight: bold;
+    animation: fadeUp 1s ease-out forwards;
+}
+
+.floating-text.coin { color: #ffd700; text-shadow: 0 0 5px #ffae00; }
+.floating-text.xp { color: #8a2be2; text-shadow: 0 0 5px #c08cff; }
+
+@keyframes fadeUp {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-80px); }
+}
+
+.hidden {
+    display: none !important;
+}
