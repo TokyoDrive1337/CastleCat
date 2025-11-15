@@ -1,243 +1,450 @@
-/* --- Глобальные Стили --- */
-body, html {
+/* Экран "Нажми, чтобы начать" */
+#start-overlay {
+    /* ... (стили не изменены) */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+#start-overlay h1 {
+    font-size: 3rem;
+    color: white;
+    text-shadow: 0 0 15px white, 0 0 25px white;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Глобальные стили */
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    height: 100%;
-    overflow: hidden;
-    font-family: 'Arial', sans-serif;
-    background-color: #1a1a1a;
-    color: #f0f0f0;
-    user-select: none;
+}
+
+body, html {
+    /* ИЗМЕНЕНИЕ 1: Адаптивность - 100% высоты */
+    height: 100%; 
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    overflow: hidden; 
 }
 
 #game-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100vw;
+    position: relative;
+    /* ИЗМЕНЕНИЕ 1: Адаптивность - 100% ширины и высоты viewport */
+    width: 100vw; 
     height: 100vh;
-    box-sizing: border-box;
-    transition: background-color 0.5s;
+    background: url('Images/BCG.png') center center no-repeat;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* --- Основные Элементы Управления --- */
-button {
-    cursor: pointer;
-    border: 2px solid #5a0000;
-    background-color: #330000;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: background-color 0.15s, transform 0.1s;
-}
-
-button:hover {
-    background-color: #5a0000;
-}
-
-button:active {
-    transform: scale(0.98);
-    background-color: #7d0000;
-}
-
-/* --- Главное Меню --- */
-#main-menu {
-    text-align: center;
-    background-color: #2b2b2b;
-    padding: 30px;
+/* Управление Музыкой */
+#music-controls {
+    position: absolute;
+    bottom: 20px; 
+    left: 20px;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 12px;
     border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    width: 80vw;
-    max-width: 600px;
+    display: flex; 
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#mute-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+#speaker-icon {
+    width: 30px;
+    height: 30px;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    transition: opacity 0.2s;
+}
+
+#mute-btn:hover #speaker-icon {
+    opacity: 0.7;
+}
+
+#volume-slider {
+    width: 80px;
+    cursor: pointer;
+}
+
+
+/* ИЗМЕНЕНИЕ 4: Переключатель языков (верхний правый угол) */
+#lang-switcher {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000; /* Поднять выше меню */
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    border-radius: 10px;
+    display: flex;
+    gap: 5px; /* Уменьшаем расстояние между флагами */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#lang-switcher img {
+    width: 40px;
+    height: 30px;
+    cursor: pointer;
+    margin-left: 0; /* Убираем лишний маржин */
+    border: 2px solid transparent;
+    border-radius: 5px;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+#lang-switcher img:hover {
+    transform: scale(1.1);
+    border-color: #ffd700;
+}
+
+/* Главное меню */
+#main-menu {
+    /* ИЗМЕНЕНИЕ 1: Адаптивность - используем max-width и vh/vw */
+    width: 90vw; 
+    max-width: 1000px;
+    padding: 20px; /* Уменьшаем padding для телефонов */
+    text-align: center;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#main-menu h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
 }
 
 .class-selection {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap; 
-    gap: 15px;
-    margin-top: 20px;
+    justify-content: center; /* Центрируем, если не хватает места */
+    flex-wrap: wrap; /* ИЗМЕНЕНИЕ 1: Перенос элементов на новую строку */
+    gap: 15px; /* Уменьшаем расстояние */
 }
 
 .class-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 15px; /* Уменьшаем padding */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /* ИЗМЕНЕНИЕ 1: Гибкая ширина для мобильных */
     width: 45%; 
     max-width: 200px;
-    padding: 15px 10px;
-    font-size: 1.1rem;
+    height: auto;
 }
 
-/* --- Игровой Экран --- */
+.class-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+}
+
+.class-btn img {
+    /* ИЗМЕНЕНИЕ 2: Для лучшего "слияния" с фоном кнопки */
+    /* Если картинки имеют белый фон, это поможет их "вырезать" */
+    width: 100%;
+    max-width: 120px; /* Ограничиваем размер картинки */
+    height: auto;
+    object-fit: contain;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    /* Добавляем тень, чтобы персонаж не сливался с фоном кнопки */
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.7)); 
+}
+
+.class-btn span {
+    font-size: 1.1rem;
+    color: white;
+    font-weight: bold;
+}
+
+/* Игровой экран */
 #game-screen {
     width: 100%;
     height: 100%;
     display: flex;
-    flex-direction: column; 
-    padding: 10px; 
-    justify-content: space-between; 
+    flex-direction: column;
+    padding: 10px; /* Уменьшаем padding */
+}
+
+/* Панель статистики */
+#stats-bar {
+    display: flex;
+    justify-content: flex-start; 
     align-items: center;
-}
-
-/* --- Контейнер XP и Уровня --- */
-#xp-container {
-    width: 90%;
-    max-width: 800px;
-    text-align: center;
-    margin-top: 10px;
-}
-
-#level-info {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #FFD700; /* Золотой цвет */
-    margin-bottom: 5px;
-    /* УДАЛЕНА ОТДЕЛЬНАЯ СТРОКА ДЛЯ ПРОЦЕНТА - теперь он в JS */
-}
-
-#xp-bar-container {
     width: 100%;
-    height: 25px;
-    background-color: #333;
-    border-radius: 12px;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 15px;
+    margin-top: 50px; /* Учитываем место для lang-switcher */
+}
+
+#level-display {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+
+/* Контейнер Монет внизу */
+#money-container-bottom {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 20px;
+    z-index: 1001;
+    background: url('Images/XMONEY.png') right center no-repeat;
+    background-size: 50px;
+    padding: 10px 65px 10px 20px;
+    background-color: rgba(0, 0, 0, 0.6); /* Немного темнее для контраста */
+    border-radius: 20px;
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+}
+
+#money-count {
+    font-size: 2rem; /* Немного меньше для мобильных */
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700, 0 0 20px #ffae00;
+}
+
+
+/* ИЗМЕНЕНИЕ 3: Стиль Шкалы Опыта (XP) */
+#xp-bar-container {
+    width: 95%; /* Шире для мобильных */
+    max-width: 800px;
+    height: 35px; /* Чуть меньше */
+    margin: 15px auto;
+    border-radius: 20px;
+    position: relative;
     overflow: hidden;
-    border: 2px solid #FFD700;
-    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 2px solid rgba(255, 255, 255, 0.5); /* Более заметная рамка */
 }
 
-#xp-bar {
+#xp-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
     height: 100%;
-    width: 0%;
-    background-color: #FF4500; /* Оранжево-красный */
-    transition: width 0.3s ease-out;
+    width: 0; 
+    /* Эффектный градиент для "живой" шкалы */
+    background: linear-gradient(90deg, #8a2be2 0%, #a766ff 100%);
+    border-radius: 20px;
+    transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Более плавный переход */
 }
 
-/* --- Область Клика --- */
-#click-area {
-    flex-grow: 1; 
+#xp-bar-sparkles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Эффект блика */
+    background: linear-gradient(
+        100deg,
+        rgba(255, 255, 255, 0) 20%,
+        rgba(255, 255, 255, 0.5) 50%, /* Более заметный блик */
+        rgba(255, 255, 255, 0) 80%
+    );
+    background-size: 300% 100%;
+    animation: sparkle 5s linear infinite; /* Немного замедлили */
+    opacity: 0.8;
+}
+
+#xp-text {
+    position: absolute;
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    cursor: url(Images/cursor_hand.png), pointer; /* Пользовательский курсор */
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-shadow: 0 0 5px black, 0 0 10px black;
+    z-index: 5;
+    color: white;
+}
+
+@keyframes sparkle {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Область клика (персонаж) */
+#click-area {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #character-image {
-    width: 200px; /* Базовый размер */
-    height: auto;
-    transition: transform 0.05s;
-    user-drag: none;
-    user-select: none;
-    max-width: 90vw;
-    max-height: 50vh;
+    max-width: 90vw; /* Адаптация */
+    max-height: 50vh; /* Адаптация */
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
 }
 
 #character-image:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
 }
 
-/* --- Магазин --- */
+/* Магазин */
 #shop {
-    width: 90%;
-    max-width: 800px;
     display: flex;
     justify-content: center;
-    flex-wrap: wrap; 
-    gap: 10px; 
-    padding: 10px 0;
-    margin-bottom: 70px; /* Отступ от нижнего контейнера монет */
+    flex-wrap: wrap; /* ИЗМЕНЕНИЕ 1: Перенос элементов на новую строку */
+    gap: 15px; /* Уменьшаем расстояние */
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px 15px 0 0; /* Закругляем только верх */
+    margin-bottom: 60px; /* Оставляем место для контейнера монет */
 }
 
 .shop-item {
-    width: 30%; 
-    min-width: 100px; 
-    padding: 8px;
-    font-size: 0.9rem;
-    line-height: 1.2;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 10px 5px; /* Меньше padding */
+    cursor: pointer;
+    color: white;
+    width: 120px; /* Немного меньше для мобильных */
+    max-width: 30%; /* Адаптивная ширина */
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    text-align: center;
 }
 
-/* Переопределяем цену для "Волшебной Травы" в кнопке для отображения */
-#shop-btn-2 br + span {
-    display: none; /* Скрываем старую цену в HTML */
+.shop-item img { 
+    width: 50px; 
+    height: 50px; 
+    /* ИЗМЕНЕНИЕ 2: Для лучшего отображения картинок */
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); 
 }
-/* ДОБАВЛЕНИЕ СТОИМОСТИ В СТИЛЯХ: ЦЕНА НА ТРАВУ 160 */
-#shop-btn-2::after {
-    content: "Цена: 160"; 
-}
+.shop-item span { font-weight: bold; font-size: 0.9rem; }
+.shop-item .item-desc { font-size: 0.75rem; font-weight: normal; color: #ccc; }
+.shop-item .item-cost { font-size: 0.9rem; font-weight: bold; color: #ffd700; }
 
-/* --- Контейнер Монет (в нижнем углу) --- */
-#money-container-bottom {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #333333;
-    color: #FFD700;
-    padding: 10px 80px 10px 20px; 
-    border-radius: 15px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-    
-    /* Иконка монеты справа */
-    background-image: url('Images/coin.png'); 
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 50px; 
-    border: 3px solid #FFD700;
-}
+#item-food:hover { box-shadow: 0 0 15px 5px #ff69b4; transform: translateY(-5px); }
+#item-water:hover { box-shadow: 0 0 15px 5px #00bfff; transform: translateY(-5px); }
+#item-herb:hover { box-shadow: 0 0 15px 5px #32cd32; transform: translateY(-5px); }
 
-/* --- Сообщение о Повышении Уровня --- */
-#levelup-message {
-    position: fixed;
+/* Всплывающий текст */
+#floating-text-container {
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.85);
-    color: #00FF00;
-    padding: 20px 40px;
-    border-radius: 10px;
-    border: 3px solid #00FF00;
-    text-align: center;
+    z-index: 1000;
+    pointer-events: none; 
+}
+
+.floating-text {
+    position: absolute;
     font-size: 1.5rem;
     font-weight: bold;
-    z-index: 100;
-    animation: fadeOut 3s forwards;
+    animation: fadeUp 1s ease-out forwards;
+}
+
+.floating-text.coin { color: #ffd700; text-shadow: 0 0 5px #ffae00; }
+.floating-text.xp { color: #8a2be2; text-shadow: 0 0 5px #c08cff; }
+
+@keyframes fadeUp {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-80px); }
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
-/* --- Медиазапросы для Телефонов --- */
+/* ИЗМЕНЕНИЕ 1: Медиазапросы для лучшей адаптации под мобильные устройства */
 @media (max-width: 600px) {
-    #main-menu { padding: 15px; width: 95vw; }
-    .class-btn { width: 90%; max-width: none; font-size: 1rem; }
-
-    #xp-bar-container { height: 20px; }
-    #level-info { font-size: 1rem; }
+    #main-menu {
+        padding: 15px;
+        width: 95vw;
+    }
     
-    #character-image { max-height: 40vh; }
-    
-    #shop { margin-bottom: 60px; }
-    .shop-item {
-        width: 30%; 
-        min-width: 80px; 
-        padding: 5px;
-        font-size: 0.8rem;
+    #main-menu h2 {
+        font-size: 1.5rem;
     }
 
+    .class-btn {
+        width: 45%; 
+        padding: 10px;
+    }
+
+    .class-btn img {
+        max-width: 100px;
+    }
+
+    #stats-bar {
+        padding: 8px 15px;
+        margin-top: 50px;
+    }
+    
+    #xp-bar-container {
+        height: 30px;
+        margin: 10px auto;
+    }
+
+    #xp-text {
+        font-size: 0.9rem;
+    }
+
+    #shop {
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .shop-item {
+        width: 30%;
+        max-width: 100px;
+    }
+    
     #money-container-bottom {
         bottom: 10px;
-        right: 10px;
         padding: 8px 60px 8px 15px;
-        font-size: 1.2rem;
         background-size: 40px;
     }
-}
-
-/* --- Анимации --- */
-@keyframes fadeOut {
-    0% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { opacity: 0; display: none; }
+    
+    #money-count {
+        font-size: 1.5rem;
+    }
 }
