@@ -1,39 +1,55 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. Состояние Игры ---
+    // --- 1. Константы и Инициализация ---
+    const getXpToNextLevel = (lvl) => 1000 + (lvl * 100) + Math.pow(lvl, 2) * 50; 
+    const MAX_LEVEL = 5;
+    const initialXPNeeded = getXpToNextLevel(1);
+
+    // Список всех классов
+    const classList = ['krest', 'BOW', 'MAG', 'krestos'];
+
+    // Цвета для XP-бара в зависимости от уровня (до 5 уровня)
+    const levelColors = [
+        'linear-gradient(90deg, #1e90ff 0%, #00bfff 100%)',  // Level 1: Голубой (Базовый)
+        'linear-gradient(90deg, #3cb371 0%, #66cdaa 100%)',  // Level 2: Зеленый (Трава)
+        'linear-gradient(90deg, #ffa500 0%, #ff6347 100%)',  // Level 3: Оранжевый (Огонь)
+        'linear-gradient(90deg, #8a2be2 0%, #da70d6 100%)',  // Level 4: Фиолетовый (Магия)
+        'linear-gradient(90deg, #ffd700 0%, #ffec8b 100%)'   // Level 5: Золотой (Макс)
+    ];
+
+    // Общая структура данных для всех классов (заполняется/перезаписывается при загрузке)
+    let playerData = {};
+    
+    // Инициализация стандартных данных для нового класса
+    const createNewClassData = () => ({
+        money: 0, 
+        xp: 0, 
+        level: 1, 
+        xpNeeded: initialXPNeeded 
+    });
+
+    // --- Локальное состояние текущей игры ---
     let money = 0;
     let xp = 0;
     let level = 1;
+    let xpNeededForCurrentLevel = initialXPNeeded; 
     let selectedClass = '';
     let currentLang = 'en'; 
-    const getXpToNextLevel = (lvl) => 1000 + (lvl * 100) + Math.pow(lvl, 2) * 50; 
-    let xpNeededForCurrentLevel = getXpToNextLevel(1); 
-    const MAX_LEVEL = 5;
-
-    // Общая структура данных для всех классов
-    let playerData = {
-        krest: { money: 0, xp: 0, level: 1, xpNeeded: getXpToNextLevel(1) },
-        BOW: { money: 0, xp: 0, level: 1, xpNeeded: getXpToNextLevel(1) },
-        MAG: { money: 0, xp: 0, level: 1, xpNeeded: getXpToNextLevel(1) },
-        krestos: { money: 0, xp: 0, level: 1, xpNeeded: getXpToNextLevel(1) }
-    };
 
     // Состояние музыки
     let musicState = {
         volume: 30,
         muted: false,
-        playedOnce: false // Для обхода автовоспроизведения в браузере
+        playedOnce: false 
     };
 
     // --- 2. Элементы DOM ---
     const dom = {
         startOverlay: document.getElementById('start-overlay'), 
         music: document.getElementById('bg-music'),
-        
         muteBtn: document.getElementById('mute-btn'),
         speakerIcon: document.getElementById('speaker-icon'),
         volumeSlider: document.getElementById('volume-slider'),
-        
         mainMenu: document.getElementById('main-menu'),
         gameScreen: document.getElementById('game-screen'),
         moneyContainerBottom: document.getElementById('money-container-bottom'), 
@@ -89,8 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 4. Функции Сохранения/Загрузки ---
     
     function saveGame() {
-        // Сохраняем прогресс текущего класса перед общим сохранением
-        if (selectedClass) {
+        if (selectedClass && classList.includes(selectedClass)) {
             playerData[selectedClass] = {
                 money: money,
                 xp: xp,
@@ -102,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const fullSave = {
             playerData: playerData,
             currentLang: currentLang,
-            selectedClass: selectedClass,
+            selectedClass: selectedClass, // Сохраняем последний выбранный класс
             musicState: musicState
         };
         localStorage.setItem('fullGameSave', JSON.stringify(fullSave));
@@ -110,15 +125,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadGame() {
         const savedData = localStorage.getItem('fullGameSave');
+        
+        // 1. Инициализация всех классов по умолчанию
+        classList.forEach(cls => {
+            playerData[cls] = createNewClassData();
+        });
+
         if (savedData) {
             const fullSave = JSON.parse(savedData);
             
-            playerData = fullSave.playerData || playerData;
+            if (fullSave.playerData) {
+                Object.keys(fullSave.playerData).forEach(cls => {
+                    if (classList.includes(cls)) {
+                        playerData[cls] = fullSave.playerData[cls];
+                    }
+                });
+            }
+
             currentLang = fullSave.currentLang || 'en';
             selectedClass = fullSave.selectedClass || '';
             musicState = fullSave.musicState || musicState;
             
-            // Загружаем данные текущего класса
+            // 3. Загружаем данные последнего выбранного класса (чтобы при старте увидеть актуальный прогресс)
             if (selectedClass && playerData[selectedClass]) {
                 const classData = playerData[selectedClass];
                 money = classData.money;
@@ -127,24 +155,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 xpNeededForCurrentLevel = classData.xpNeeded;
             }
 
-            // Применяем язык и музыку
+            // 4. Применяем язык и музыку
             changeLanguage(currentLang, true); 
             applyMusicState();
             
-            // Если класс выбран, сразу показываем игровой экран
-            if (selectedClass) {
-                dom.startOverlay.style.display = 'none'; 
-                dom.mainMenu.classList.add('hidden');
-                dom.gameScreen.classList.remove('hidden');
-                dom.moneyContainerBottom.classList.remove('hidden');
-            }
+            // 5. Показываем нужный экран: overlay при загрузке, меню при клике
             
             updateUI(); 
-            return true;
         }
-        changeLanguage(currentLang, true); // Применяем язык по умолчанию
+        
+        changeLanguage(currentLang, true); 
         applyMusicState();
-        return false;
     }
 
     // --- 5. Функции Музыки ---
@@ -181,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             dom.speakerIcon.src = 'Images/icon_speaker_on.png';
             dom.volumeSlider.value = musicState.volume; 
-            if (musicState.playedOnce) dom.music.play();
+            if (musicState.playedOnce) dom.music.play(); 
         }
         saveGame();
     };
@@ -197,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
             musicState.muted = false;
             dom.music.muted = false;
             dom.speakerIcon.src = 'Images/icon_speaker_on.png';
-            if (musicState.playedOnce) dom.music.play();
+            if (musicState.playedOnce && dom.music.paused) dom.music.play();
         } else {
             musicState.muted = true;
             dom.music.muted = true;
@@ -208,6 +229,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- 6. Функции Игры ---
+
+    function getBarColorByLevel(currentLevel) {
+        // Уровни 1-5 соответствуют индексам 0-4
+        const index = Math.min(currentLevel, MAX_LEVEL) - 1;
+        return levelColors[index] || levelColors[0]; // По умолчанию - первый цвет
+    }
 
     window.changeLanguage = (lang, skipSave = false) => {
         currentLang = lang;
@@ -223,8 +250,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.selectClass = (newClass) => {
-        // 1. Сохраняем прогресс текущего класса, если он был
-        if (selectedClass) {
+        // 1. Сохраняем прогресс предыдущего класса (если он был выбран)
+        if (selectedClass && classList.includes(selectedClass)) {
             playerData[selectedClass] = {
                 money: money,
                 xp: xp,
@@ -235,8 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         selectedClass = newClass;
 
-        // 2. Загружаем или инициализируем прогресс нового класса
-        const classData = playerData[newClass];
+        // 2. Загружаем прогресс нового класса
+        const classData = playerData[newClass] || createNewClassData();
+
         money = classData.money;
         xp = classData.xp;
         level = classData.level;
@@ -332,7 +360,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         dom.xpBarFill.style.width = `${xpPercent}%`;
         
-        // Эффект "живой воды": переключение анимации дрожания
+        // --- Динамический цвет XP-бара ---
+        dom.xpBarFill.style.background = getBarColorByLevel(level);
+
         if (xpPercent > 0 && xpPercent < 100) {
             dom.xpBarContainer.classList.remove('idle-wave');
         } else {
@@ -372,21 +402,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 7. Инициализация ---
     
-    loadGame(); // Загружаем состояние игры и музыки
+    loadGame(); 
 
     dom.startOverlay.addEventListener('click', () => {
         playMusic(); 
         dom.startOverlay.style.display = 'none'; 
         
-        if (!selectedClass) {
-            // Если класс не был выбран при загрузке, показываем меню
-            dom.mainMenu.classList.remove('hidden');
-        }
+        // Теперь меню выбора класса остаётся видимым
+        dom.mainMenu.classList.remove('hidden'); 
 
     }, { once: true }); 
 
-    // Запуск музыки при загрузке, если уже было подтверждение
-    if (musicState.playedOnce) {
+    if (musicState.playedOnce && !musicState.muted) {
         playMusic();
     }
 });
