@@ -37,7 +37,8 @@
 }
 
 body, html {
-    height: 100%;
+    /* ИЗМЕНЕНИЕ 1: Адаптивность - 100% высоты */
+    height: 100%; 
     font-family: Arial, Helvetica, sans-serif;
     color: white;
     overflow: hidden; 
@@ -45,7 +46,8 @@ body, html {
 
 #game-container {
     position: relative;
-    width: 100vw;
+    /* ИЗМЕНЕНИЕ 1: Адаптивность - 100% ширины и высоты viewport */
+    width: 100vw; 
     height: 100vh;
     background: url('Images/BCG.png') center center no-repeat;
     background-size: cover;
@@ -54,14 +56,9 @@ body, html {
     align-items: center;
 }
 
-/* ==========================================
-  ИСПРАВЛЕННЫЕ СТИЛИ: Управление Музыкой
-  (Теперь в левом нижнем углу)
-  ==========================================
-*/
+/* Управление Музыкой */
 #music-controls {
     position: absolute;
-    /* ИСПРАВЛЕНО: Снизу */
     bottom: 20px; 
     left: 20px;
     z-index: 100;
@@ -96,40 +93,43 @@ body, html {
     width: 80px;
     cursor: pointer;
 }
-/* ======================================== */
 
 
-/* Переключатель языков */
+/* ИЗМЕНЕНИЕ 4: Переключатель языков (верхний правый угол) */
 #lang-switcher {
     position: absolute;
     top: 20px;
     right: 20px;
-    z-index: 100;
-    background: rgba(0, 0, 0, 0.3);
+    z-index: 1000; /* Поднять выше меню */
+    background: rgba(0, 0, 0, 0.5);
     padding: 5px;
     border-radius: 10px;
+    display: flex;
+    gap: 5px; /* Уменьшаем расстояние между флагами */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 #lang-switcher img {
     width: 40px;
     height: 30px;
     cursor: pointer;
-    margin-left: 8px;
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    margin-left: 0; /* Убираем лишний маржин */
+    border: 2px solid transparent;
     border-radius: 5px;
     transition: transform 0.2s, border-color 0.2s;
 }
 
 #lang-switcher img:hover {
     transform: scale(1.1);
-    border-color: white;
+    border-color: #ffd700;
 }
 
 /* Главное меню */
 #main-menu {
-    width: 90%;
+    /* ИЗМЕНЕНИЕ 1: Адаптивность - используем max-width и vh/vw */
+    width: 90vw; 
     max-width: 1000px;
-    padding: 40px;
+    padding: 20px; /* Уменьшаем padding для телефонов */
     text-align: center;
     background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
@@ -139,25 +139,28 @@ body, html {
 }
 
 #main-menu h2 {
-    font-size: 2.5rem;
-    margin-bottom: 30px;
+    font-size: 2rem;
+    margin-bottom: 20px;
 }
 
 .class-selection {
     display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    gap: 20px;
+    justify-content: center; /* Центрируем, если не хватает места */
+    flex-wrap: wrap; /* ИЗМЕНЕНИЕ 1: Перенос элементов на новую строку */
+    gap: 15px; /* Уменьшаем расстояние */
 }
 
 .class-btn {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 15px;
-    padding: 20px;
+    padding: 15px; /* Уменьшаем padding */
     cursor: pointer;
     transition: all 0.3s ease;
-    width: 200px;
+    /* ИЗМЕНЕНИЕ 1: Гибкая ширина для мобильных */
+    width: 45%; 
+    max-width: 200px;
+    height: auto;
 }
 
 .class-btn:hover {
@@ -166,15 +169,20 @@ body, html {
 }
 
 .class-btn img {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
+    /* ИЗМЕНЕНИЕ 2: Для лучшего "слияния" с фоном кнопки */
+    /* Если картинки имеют белый фон, это поможет их "вырезать" */
+    width: 100%;
+    max-width: 120px; /* Ограничиваем размер картинки */
+    height: auto;
+    object-fit: contain;
     border-radius: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+    /* Добавляем тень, чтобы персонаж не сливался с фоном кнопки */
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.7)); 
 }
 
 .class-btn span {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: white;
     font-weight: bold;
 }
@@ -185,7 +193,7 @@ body, html {
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 10px; /* Уменьшаем padding */
 }
 
 /* Панель статистики */
@@ -197,6 +205,7 @@ body, html {
     padding: 10px 20px;
     background: rgba(0, 0, 0, 0.4);
     border-radius: 15px;
+    margin-top: 50px; /* Учитываем место для lang-switcher */
 }
 
 #level-display {
@@ -215,32 +224,33 @@ body, html {
     background: url('Images/XMONEY.png') right center no-repeat;
     background-size: 50px;
     padding: 10px 65px 10px 20px;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.6); /* Немного темнее для контраста */
     border-radius: 20px;
-    border: 1px solid rgba(255, 215, 0, 0.3);
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
 }
 
 #money-count {
-    font-size: 2.2rem;
+    font-size: 2rem; /* Немного меньше для мобильных */
     font-weight: bold;
     color: #ffd700;
     text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700, 0 0 20px #ffae00;
 }
 
 
-/* Шкала Опыта */
+/* ИЗМЕНЕНИЕ 3: Стиль Шкалы Опыта (XP) */
 #xp-bar-container {
-    width: 90%;
+    width: 95%; /* Шире для мобильных */
     max-width: 800px;
-    height: 40px;
-    margin: 20px auto;
+    height: 35px; /* Чуть меньше */
+    margin: 15px auto;
     border-radius: 20px;
     position: relative;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.5); /* Более заметная рамка */
 }
 
 #xp-bar-fill {
@@ -249,9 +259,10 @@ body, html {
     left: 0;
     height: 100%;
     width: 0; 
-    background: #8a2be2;
+    /* Эффектный градиент для "живой" шкалы */
+    background: linear-gradient(90deg, #8a2be2 0%, #a766ff 100%);
     border-radius: 20px;
-    transition: width 0.5s ease-out;
+    transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Более плавный переход */
 }
 
 #xp-bar-sparkles {
@@ -260,14 +271,16 @@ body, html {
     left: 0;
     width: 100%;
     height: 100%;
+    /* Эффект блика */
     background: linear-gradient(
         100deg,
         rgba(255, 255, 255, 0) 20%,
-        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0.5) 50%, /* Более заметный блик */
         rgba(255, 255, 255, 0) 80%
     );
-    background-size: 200% 100%;
-    animation: sparkle 3s linear infinite;
+    background-size: 300% 100%;
+    animation: sparkle 5s linear infinite; /* Немного замедлили */
+    opacity: 0.8;
 }
 
 #xp-text {
@@ -278,9 +291,10 @@ body, html {
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    font-size: 1rem;
-    text-shadow: 0 0 3px black;
+    font-size: 1.1rem;
+    text-shadow: 0 0 5px black, 0 0 10px black;
     z-index: 5;
+    color: white;
 }
 
 @keyframes sparkle {
@@ -297,8 +311,8 @@ body, html {
 }
 
 #character-image {
-    max-width: 300px;
-    max-height: 40vh; 
+    max-width: 90vw; /* Адаптация */
+    max-height: 50vh; /* Адаптация */
     cursor: pointer;
     transition: transform 0.1s ease;
     filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
@@ -312,31 +326,39 @@ body, html {
 #shop {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    padding: 20px;
+    flex-wrap: wrap; /* ИЗМЕНЕНИЕ 1: Перенос элементов на новую строку */
+    gap: 15px; /* Уменьшаем расстояние */
+    padding: 15px;
     background: rgba(0, 0, 0, 0.3);
-    border-radius: 15px;
-    margin-bottom: 60px; 
+    border-radius: 15px 15px 0 0; /* Закругляем только верх */
+    margin-bottom: 60px; /* Оставляем место для контейнера монет */
 }
 
 .shop-item {
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 10px;
-    padding: 10px;
+    padding: 10px 5px; /* Меньше padding */
     cursor: pointer;
     color: white;
-    width: 140px;
+    width: 120px; /* Немного меньше для мобильных */
+    max-width: 30%; /* Адаптивная ширина */
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 3px;
+    text-align: center;
 }
 
-.shop-item img { width: 60px; height: 60px; }
-.shop-item span { font-weight: bold; }
-.shop-item .item-desc { font-size: 0.8rem; font-weight: normal; color: #ccc; }
+.shop-item img { 
+    width: 50px; 
+    height: 50px; 
+    /* ИЗМЕНЕНИЕ 2: Для лучшего отображения картинок */
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); 
+}
+.shop-item span { font-weight: bold; font-size: 0.9rem; }
+.shop-item .item-desc { font-size: 0.75rem; font-weight: normal; color: #ccc; }
 .shop-item .item-cost { font-size: 0.9rem; font-weight: bold; color: #ffd700; }
 
 #item-food:hover { box-shadow: 0 0 15px 5px #ff69b4; transform: translateY(-5px); }
@@ -370,4 +392,59 @@ body, html {
 
 .hidden {
     display: none !important;
+}
+
+/* ИЗМЕНЕНИЕ 1: Медиазапросы для лучшей адаптации под мобильные устройства */
+@media (max-width: 600px) {
+    #main-menu {
+        padding: 15px;
+        width: 95vw;
+    }
+    
+    #main-menu h2 {
+        font-size: 1.5rem;
+    }
+
+    .class-btn {
+        width: 45%; 
+        padding: 10px;
+    }
+
+    .class-btn img {
+        max-width: 100px;
+    }
+
+    #stats-bar {
+        padding: 8px 15px;
+        margin-top: 50px;
+    }
+    
+    #xp-bar-container {
+        height: 30px;
+        margin: 10px auto;
+    }
+
+    #xp-text {
+        font-size: 0.9rem;
+    }
+
+    #shop {
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .shop-item {
+        width: 30%;
+        max-width: 100px;
+    }
+    
+    #money-container-bottom {
+        bottom: 10px;
+        padding: 8px 60px 8px 15px;
+        background-size: 40px;
+    }
+    
+    #money-count {
+        font-size: 1.5rem;
+    }
 }
