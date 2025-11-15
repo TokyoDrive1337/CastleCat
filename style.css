@@ -1,6 +1,5 @@
 /* Экран "Нажми, чтобы начать" */
 #start-overlay {
-    /* ... (стили не изменены) */
     position: absolute;
     top: 0;
     left: 0;
@@ -37,7 +36,6 @@
 }
 
 body, html {
-    /* ИЗМЕНЕНИЕ 1: Адаптивность - 100% высоты */
     height: 100%; 
     font-family: Arial, Helvetica, sans-serif;
     color: white;
@@ -46,7 +44,6 @@ body, html {
 
 #game-container {
     position: relative;
-    /* ИЗМЕНЕНИЕ 1: Адаптивность - 100% ширины и высоты viewport */
     width: 100vw; 
     height: 100vh;
     background: url('Images/BCG.png') center center no-repeat;
@@ -95,17 +92,17 @@ body, html {
 }
 
 
-/* ИЗМЕНЕНИЕ 4: Переключатель языков (верхний правый угол) */
+/* Переключатель языков */
 #lang-switcher {
     position: absolute;
     top: 20px;
     right: 20px;
-    z-index: 1000; /* Поднять выше меню */
+    z-index: 1000; 
     background: rgba(0, 0, 0, 0.5);
     padding: 5px;
     border-radius: 10px;
     display: flex;
-    gap: 5px; /* Уменьшаем расстояние между флагами */
+    gap: 5px; 
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -113,7 +110,7 @@ body, html {
     width: 40px;
     height: 30px;
     cursor: pointer;
-    margin-left: 0; /* Убираем лишний маржин */
+    margin-left: 0; 
     border: 2px solid transparent;
     border-radius: 5px;
     transition: transform 0.2s, border-color 0.2s;
@@ -126,10 +123,9 @@ body, html {
 
 /* Главное меню */
 #main-menu {
-    /* ИЗМЕНЕНИЕ 1: Адаптивность - используем max-width и vh/vw */
     width: 90vw; 
     max-width: 1000px;
-    padding: 20px; /* Уменьшаем padding для телефонов */
+    padding: 20px; 
     text-align: center;
     background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
@@ -145,19 +141,18 @@ body, html {
 
 .class-selection {
     display: flex;
-    justify-content: center; /* Центрируем, если не хватает места */
-    flex-wrap: wrap; /* ИЗМЕНЕНИЕ 1: Перенос элементов на новую строку */
-    gap: 15px; /* Уменьшаем расстояние */
+    justify-content: center; 
+    flex-wrap: wrap; 
+    gap: 15px; 
 }
 
 .class-btn {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 15px;
-    padding: 15px; /* Уменьшаем padding */
+    padding: 15px; 
     cursor: pointer;
     transition: all 0.3s ease;
-    /* ИЗМЕНЕНИЕ 1: Гибкая ширина для мобильных */
     width: 45%; 
     max-width: 200px;
     height: auto;
@@ -169,15 +164,12 @@ body, html {
 }
 
 .class-btn img {
-    /* ИЗМЕНЕНИЕ 2: Для лучшего "слияния" с фоном кнопки */
-    /* Если картинки имеют белый фон, это поможет их "вырезать" */
     width: 100%;
-    max-width: 120px; /* Ограничиваем размер картинки */
+    max-width: 120px; 
     height: auto;
     object-fit: contain;
     border-radius: 10px;
     margin-bottom: 5px;
-    /* Добавляем тень, чтобы персонаж не сливался с фоном кнопки */
     filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.7)); 
 }
 
@@ -193,7 +185,7 @@ body, html {
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 10px; /* Уменьшаем padding */
+    padding: 10px; 
 }
 
 /* Панель статистики */
@@ -202,17 +194,9 @@ body, html {
     justify-content: flex-start; 
     align-items: center;
     width: 100%;
-    padding: 10px 20px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 15px;
-    margin-top: 50px; /* Учитываем место для lang-switcher */
+    padding: 0 20px; /* Убрал лишний фон и паддинг */
+    margin-top: 50px; 
 }
-
-#level-display {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
 
 /* Контейнер Монет внизу */
 #money-container-bottom {
@@ -224,25 +208,25 @@ body, html {
     background: url('Images/XMONEY.png') right center no-repeat;
     background-size: 50px;
     padding: 10px 65px 10px 20px;
-    background-color: rgba(0, 0, 0, 0.6); /* Немного темнее для контраста */
+    background-color: rgba(0, 0, 0, 0.6); 
     border-radius: 20px;
     border: 1px solid rgba(255, 215, 0, 0.5);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
 }
 
 #money-count {
-    font-size: 2rem; /* Немного меньше для мобильных */
+    font-size: 2rem; 
     font-weight: bold;
     color: #ffd700;
     text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700, 0 0 20px #ffae00;
 }
 
 
-/* ИЗМЕНЕНИЕ 3: Стиль Шкалы Опыта (XP) */
+/* Стиль Шкалы Опыта (XP) */
 #xp-bar-container {
-    width: 95%; /* Шире для мобильных */
+    width: 95%; 
     max-width: 800px;
-    height: 35px; /* Чуть меньше */
+    height: 35px; 
     margin: 15px auto;
     border-radius: 20px;
     position: relative;
@@ -250,7 +234,19 @@ body, html {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
-    border: 2px solid rgba(255, 255, 255, 0.5); /* Более заметная рамка */
+    border: 2px solid rgba(255, 255, 255, 0.5); 
+}
+
+/* ЭФФЕКТ ЖИВОЙ ВОДЫ: Дрожание при простое */
+.idle-wave {
+    animation: slight-shake 3s ease-in-out infinite alternate;
+}
+
+@keyframes slight-shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    33% { transform: translate(-1px, 0px) rotate(-0.2deg); }
+    66% { transform: translate(1px, -1px) rotate(0.2deg); }
+    100% { transform: translate(-1px, 1px) rotate(-0.1deg); }
 }
 
 #xp-bar-fill {
@@ -259,10 +255,10 @@ body, html {
     left: 0;
     height: 100%;
     width: 0; 
-    /* Эффектный градиент для "живой" шкалы */
-    background: linear-gradient(90deg, #8a2be2 0%, #a766ff 100%);
+    /* "Водный" градиент */
+    background: linear-gradient(90deg, #00bfff 0%, #8a2be2 100%);
     border-radius: 20px;
-    transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Более плавный переход */
+    transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
 }
 
 #xp-bar-sparkles {
@@ -275,11 +271,11 @@ body, html {
     background: linear-gradient(
         100deg,
         rgba(255, 255, 255, 0) 20%,
-        rgba(255, 255, 255, 0.5) 50%, /* Более заметный блик */
+        rgba(255, 255, 255, 0.5) 50%, 
         rgba(255, 255, 255, 0) 80%
     );
     background-size: 300% 100%;
-    animation: sparkle 5s linear infinite; /* Немного замедлили */
+    animation: sparkle 5s linear infinite; 
     opacity: 0.8;
 }
 
@@ -311,8 +307,8 @@ body, html {
 }
 
 #character-image {
-    max-width: 90vw; /* Адаптация */
-    max-height: 50vh; /* Адаптация */
+    max-width: 90vw; 
+    max-height: 50vh; 
     cursor: pointer;
     transition: transform 0.1s ease;
     filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
@@ -326,23 +322,23 @@ body, html {
 #shop {
     display: flex;
     justify-content: center;
-    flex-wrap: wrap; /* ИЗМЕНЕНИЕ 1: Перенос элементов на новую строку */
-    gap: 15px; /* Уменьшаем расстояние */
+    flex-wrap: wrap; 
+    gap: 15px; 
     padding: 15px;
     background: rgba(0, 0, 0, 0.3);
-    border-radius: 15px 15px 0 0; /* Закругляем только верх */
-    margin-bottom: 60px; /* Оставляем место для контейнера монет */
+    border-radius: 15px 15px 0 0; 
+    margin-bottom: 60px; 
 }
 
 .shop-item {
     background: rgba(0, 0, 0, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 10px;
-    padding: 10px 5px; /* Меньше padding */
+    padding: 10px 5px; 
     cursor: pointer;
     color: white;
-    width: 120px; /* Немного меньше для мобильных */
-    max-width: 30%; /* Адаптивная ширина */
+    width: 120px; 
+    max-width: 30%; 
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -354,7 +350,6 @@ body, html {
 .shop-item img { 
     width: 50px; 
     height: 50px; 
-    /* ИЗМЕНЕНИЕ 2: Для лучшего отображения картинок */
     filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); 
 }
 .shop-item span { font-weight: bold; font-size: 0.9rem; }
@@ -390,11 +385,34 @@ body, html {
     to { opacity: 0; transform: translateY(-80px); }
 }
 
+/* Индикатор сохранения */
+#save-indicator {
+    position: fixed;
+    top: 10px;
+    right: 50%;
+    transform: translateX(50%);
+    background: rgba(0, 255, 0, 0.7);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    z-index: 2000;
+    animation: fadeInOut 1s ease-in-out forwards;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translate(50%, -20px); }
+    25% { opacity: 1; transform: translate(50%, 0); }
+    75% { opacity: 1; transform: translate(50%, 0); }
+    100% { opacity: 0; transform: translate(50%, -20px); }
+}
+
 .hidden {
     display: none !important;
 }
 
-/* ИЗМЕНЕНИЕ 1: Медиазапросы для лучшей адаптации под мобильные устройства */
+/* Медиазапросы для лучшей адаптации под мобильные устройства */
 @media (max-width: 600px) {
     #main-menu {
         padding: 15px;
@@ -415,7 +433,7 @@ body, html {
     }
 
     #stats-bar {
-        padding: 8px 15px;
+        padding: 0 15px;
         margin-top: 50px;
     }
     
