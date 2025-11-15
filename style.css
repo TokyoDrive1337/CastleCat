@@ -136,8 +136,8 @@ body, html {
     height: 15vw;
     max-width: 150px;
     max-height: 150px;
-    /* ФИКС: Добавляем фильтр, чтобы скрыть "белый фон" и выделить изображение */
-    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
+    /* УСИЛЕННЫЙ ФИЛЬТР для скрытия белого фона на PNG */
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.4));
 }
 
 .class-btn span {
@@ -196,7 +196,7 @@ body, html {
 }
 
 
-/* Шкала Опыта и ЭФФЕКТЫ (НОВЫЙ АНИМАЦИЯ) */
+/* Шкала Опыта и ЭФФЕКТЫ */
 #xp-bar-container {
     width: 90%;
     max-width: 800px;
@@ -219,18 +219,18 @@ body, html {
     width: 0; 
     background: #8a2be2;
     border-radius: 20px;
-    transition: width 0.5s ease-out; /* Плавное заполнение */
+    transition: width 0.5s ease-out, filter 0.5s; /* Добавлено filter для плавности */
     filter: brightness(1.0);
 }
 
 /* Анимация "живого" повышения уровня */
 .level-up-flash {
-    animation: levelFlash 0.3s ease-in-out;
+    animation: levelFlash 0.5s ease-in-out;
 }
 
 @keyframes levelFlash {
     0% { filter: brightness(1.5); box-shadow: 0 0 10px #c08cff; }
-    50% { filter: brightness(2.0); box-shadow: 0 0 20px #ff0; }
+    50% { filter: brightness(2.5); box-shadow: 0 0 30px #ff0, 0 0 50px #c08cff; }
     100% { filter: brightness(1.0); box-shadow: none; }
 }
 
@@ -281,11 +281,15 @@ body, html {
     max-width: 60vw; 
     max-height: 50vh; 
     cursor: pointer;
-    transition: transform 0.1s ease;
+    /* УДАЛЕНО: transition: transform 0.1s ease; - чтобы не сдвигалось */
     filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
 }
 
-/* ФИКС: УДАЛЕНО: #character-image:active { transform: scale(0.97); } - чтобы не было сдвига при клике */
+/* ФИКС: Убедимся, что нет никаких трансформаций, вызывающих сдвиг */
+#character-image:active {
+    /* Ничего не делаем при клике, чтобы избежать сдвига */
+}
+
 
 /* Магазин */
 #shop {
@@ -302,7 +306,6 @@ body, html {
     width: 20vw; 
     max-width: 140px; 
     padding: 1vh;
-    /* ... */
 }
 /* ... (Остальные стили не изменены) ... */
 
