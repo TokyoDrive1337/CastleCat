@@ -127,11 +127,12 @@ body, html {
     max-width: 1000px;
     padding: 20px; 
     text-align: center;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.5); /* Немного темнее */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1050; /* Чтобы быть выше игрового экрана, но ниже оверлея */
 }
 
 #main-menu h2 {
@@ -186,6 +187,7 @@ body, html {
     display: flex;
     flex-direction: column;
     padding: 10px; 
+    position: absolute;
 }
 
 /* Контейнер Монет внизу */
@@ -197,18 +199,46 @@ body, html {
     z-index: 1001;
     background: url('Images/XMONEY.png') right center no-repeat;
     background-size: 50px;
-    padding: 8px 65px 8px 20px; /* Немного уменьшен паддинг */
-    background-color: rgba(0, 0, 0, 0.6); 
+    padding: 8px 65px 8px 20px;
+    background-color: rgba(0, 0, 0, 0.8); /* Более темный фон */
     border-radius: 20px;
     border: 1px solid rgba(255, 215, 0, 0.3);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    overflow: hidden; /* Скрываем излишек анимации */
 }
 
 #money-count {
-    font-size: 1.8rem; /* Уменьшен размер */
+    position: relative;
+    z-index: 2;
+    font-size: 1.8rem;
     font-weight: bold;
     color: #ffd700;
-    text-shadow: 0 0 5px #ffd700; /* Более мягкое свечение */
+    text-shadow: 0 0 5px #ffae00;
+}
+
+/* Анимация перелива золота */
+#money-shine {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: linear-gradient(
+        120deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 70%
+    );
+    background-size: 200% 100%;
+    animation: goldShine 3s linear infinite;
+    opacity: 0.6;
+}
+
+@keyframes goldShine {
+    0% { background-position: -100% 0; }
+    100% { background-position: 200% 0; }
 }
 
 
@@ -221,7 +251,8 @@ body, html {
     border-radius: 20px;
     position: relative;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.1);
+    /* Установлена прозрачность для "физики воды" */
+    background: rgba(255, 255, 255, 0.1); 
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     border: 2px solid rgba(255, 255, 255, 0.5); 
@@ -245,8 +276,8 @@ body, html {
     left: 0;
     height: 100%;
     width: 0; 
-    /* "Водный" градиент */
-    background: linear-gradient(90deg, #00bfff 0%, #8a2be2 100%);
+    /* Градиент будет установлен через JS */
+    background: linear-gradient(90deg, #1e90ff 0%, #00bfff 100%);
     border-radius: 20px;
     transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
 }
